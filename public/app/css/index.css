@@ -333,42 +333,42 @@ input:-webkit-autofill {
 }
 
 .btn-icon-twitter:before {
-    background: url("/app/img/btnicon/btnicon_twitter.png") no-repeat;
+    background: url("./app/img/btnicon/btnicon_twitter.png") no-repeat;
     width: 13px;
     height: 10px;
 }
 .btn-icon-key:before {
-    background: url("/app/img/btnicon/btnicon_key.png") no-repeat;
+    background: url("./app/img/btnicon/btnicon_key.png") no-repeat;
     width: 21px;
     height: 12px;
 }
 
 .btn-icon-edit:before {
-    background: url("/app/img/btnicon/btnicon_edit.png") no-repeat;
+    background: url("./app/img/btnicon/btnicon_edit.png") no-repeat;
     width: 18px;
     height: 18px;
 }
 
 .btn-icon-plus:before {
-    background: url("/app/img/btnicon/btnicon_plus.png") no-repeat;
+    background: url("./app/img/btnicon/btnicon_plus.png") no-repeat;
     width: 19px;
     height: 19px;
 }
 
 .btn-icon-follow-on:before {
-    background: url("/app/img/btnicon/btnicon_follow_on.png") no-repeat;
+    background: url("./app/img/btnicon/btnicon_follow_on.png") no-repeat;
     width: 18px;
     height: 18px;
 }
 
 .btn-icon-follow-off:before {
-    background: url("/app/img/btnicon/btnicon_follow_off.png") no-repeat;
+    background: url("./app/img/btnicon/btnicon_follow_off.png") no-repeat;
     width: 17px;
     height: 16px;
 }
 
 .btn-icon-mute-on:before {
-    background: url("/app/img/btnicon/btnicon_mute_on.png") no-repeat;
+    background: url("./app/img/btnicon/btnicon_mute_on.png") no-repeat;
     width: 19px;
     height: 19px;
     margin-right:8px !important;
