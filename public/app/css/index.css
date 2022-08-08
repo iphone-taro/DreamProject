@@ -375,20 +375,20 @@ input:-webkit-autofill {
 }
 
 .btn-icon-mute-off:before {
-    background: url("/app/img/btnicon/btnicon_mute_off.png") no-repeat;
+    background: url("./app/img/btnicon/btnicon_mute_off.png") no-repeat;
     width: 13px;
     height: 16px;
     margin-right:25px !important;
 }
 
 .btn-icon-bookmark-on:before {
-    background: url("/app/img/btnicon/btnicon_bookmark_on.png") no-repeat;
+    background: url("./app/img/btnicon/btnicon_bookmark_on.png") no-repeat;
     width: 16px;
     height: 14px;
 }
 
 .btn-icon-bookmark:before {
-    background: url("/app/img/btnicon/btnicon_bookmark.png") no-repeat;
+    background: url("./app/img/btnicon/btnicon_bookmark.png") no-repeat;
     width: 16px;
     height: 14px;
 }
