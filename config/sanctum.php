@@ -18,6 +18,7 @@ return [
     'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
         '%s%s',
         'localhost,localhost:3000,localhost:8001,127.0.0.1,127.0.0.1:8000,::1,iphone-taro.sakura.ne.jp',
+        env('APP_URL') ? ','.parse_url(env('APP_URL'), PHP_URL_HOST) : '',
         Sanctum::currentApplicationUrlWithPort()
         //localhost:8001追加
     ))),
