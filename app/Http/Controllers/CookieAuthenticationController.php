@@ -651,6 +651,13 @@ final class CookieAuthenticationController extends Controller
                 $image_path = file_get_contents($iconUrl);
                 file_put_contents($newFileName, $image_path);
             }
+
+            try {
+                Auth::login($newUser);                
+            } catch (AuthenticationException $e) {
+                return response()->json(['status' => Consts::API_FAILED_LOGIN]);
+            }
+
             return response()->json(['status' => Consts::API_SUCCESS]);
         } else {
             //twitterCodeを更新
