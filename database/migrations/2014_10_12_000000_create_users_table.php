@@ -18,6 +18,9 @@ return new class extends Migration
             $table->string('hash_code')->default('');
             $table->string('twitter_id')->default('');
             $table->string('twitter_code')->default('');
+            $table->boolean('show_twitter');
+            $table->string('twitter_token')->default('');
+            $table->string('twitter_token_secret')->default('');
             $table->string('mail_address')->default('');
             $table->string('password')->default('');
             $table->string('user_name');

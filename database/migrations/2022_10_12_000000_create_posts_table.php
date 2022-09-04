@@ -22,11 +22,14 @@ class CreatePostsTable extends Migration
             $table->string('conversion');
             $table->string('series');
             $table->integer('rating');
+            $table->integer('chara');
             $table->integer('creation');
             $table->string('tags');
             $table->integer('filter')->default(0);
             $table->integer('publishing');
-            $table->integer('searchable');
+            $table->string('publishing_sub1');
+            $table->string('publishing_sub2');
+            $table->boolean('searchable');
             $table->integer('view_count')->default(0);
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();

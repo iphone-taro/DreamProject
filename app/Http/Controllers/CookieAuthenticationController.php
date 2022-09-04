@@ -29,6 +29,39 @@ use App\Mail\MailMgr;
 
 final class CookieAuthenticationController extends Controller
 {
+
+    //
+    //メールアドレスチェック
+    //
+    public function checkAddress($mailAddress) {
+        if (strpos($mailAddress, '@') == false) {
+            return false;
+        } else {
+            $array = explode('@', $mailAddress);
+            if (strpos($array[0], '.jp') == false && strpos($array[0], '.com') == false && 
+            strpos($array[0], '.net') == false && strpos($array[0], '.org') == false && strpos($array[0], '.xyz') == false) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    //
+    //パスワードチェック
+    //
+    public function checkPassword($password) {
+        $pattern = "/^[a-z0-9#!?&$%+-]{0,32}$/i";
+        if (preg_match($pattern, $password)) {
+            dd("TRUE");
+            return true;
+        } else {
+            dd("FALSE");
+            return false;
+        }
+    }
+
+    
+
     //
     //基本情報取得（認証確認含め）
     //
@@ -91,10 +124,15 @@ final class CookieAuthenticationController extends Controller
         //バリデート
         try {
             $validated = $request->validate([
-                'mailAddress' => 'required|max:50',
+                'mailAddress' => 'required|max:200|email:strict,dns,spoof|string',
             ]);
         } catch (ValidationException $e) {
             return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+        }
+
+        //メールアドレスチェック
+        if ($this->checkAddress($request->mailAddress)) {
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => "MailAddress"]);
         }
 
         //メールアドレスから存在チェック
@@ -204,7 +242,7 @@ final class CookieAuthenticationController extends Controller
         try {
             $validated = $request->validate([
                 'tempId' => 'required|string|size:20',
-                'newPassword' => 'required|max:50',
+                'newPassword' => 'required|max:32|not_regex:' . Consts::REGEX_PASSWORD,
             ]);
         } catch (ValidationException $e) {
             return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
@@ -247,25 +285,31 @@ final class CookieAuthenticationController extends Controller
         //バリデート
         try {
             $validated = $request->validate([
-                'mailAddress' => 'required|max:50',
+                // 'mailAddress' => 'required|max:200|email:strict,dns,spoof|string',
+                'mailAddress' => 'required|max:200|string',
                 'kbn' => 'required',
             ]);
         } catch (ValidationException $e) {
             return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
         }
 
+        //メールアドレスチェック
+        if ($this->checkAddress($request->mailAddress)) {
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => "MailAddress"]);
+        }
+
         $kbn = $request->kbn;
 
-        if ($kbn != "CHANGE") {
-            //メールアドレス変更以外は追加バリデート
-            try {
-                $validated = $request->validate([
-                    'password' => 'required|max:50',
-                ]);
-            } catch (ValidationException $e) {
-                return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
-            }
-        }
+        // if ($kbn != "CHANGE") {
+        //     //メールアドレス変更以外は追加バリデート
+        //     try {
+        //         $validated = $request->validate([
+        //             'password' => 'required|max:32|not_regex:' . Consts::REGEX_PASSWORD,
+        //         ]);
+        //     } catch (ValidationException $e) {
+        //         return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+        //     }
+        // }
 
         //メールアドレスから存在チェック
         $chkExist = DB::table('users')->where('mail_address', $request->mailAddress)->first();
@@ -420,6 +464,7 @@ final class CookieAuthenticationController extends Controller
             $newUser = new user; 
             $newUser->user_id = $userId;
             $newUser->user_name = 'ドロップユーザー';
+            $newUser->profile = 'はじめまして';
             $newUser->twitter_id = '';
             $newUser->mail_address = $tempData->mail_address;
             $newUser->password = $tempData->password;
@@ -465,8 +510,8 @@ final class CookieAuthenticationController extends Controller
         //バリデート
         try {
             $validated = $request->validate([
-                'currentPassword' => 'required|max:50',
-                'newPassword' => 'required|max:50'
+                'currentPassword' => 'required|max:32|not_regex:' . Consts::REGEX_PASSWORD,
+                'newPassword' => 'required|max:32|not_regex:' . Consts::REGEX_PASSWORD,
             ]);
         } catch (ValidationException $e) {
             return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
@@ -574,12 +619,19 @@ final class CookieAuthenticationController extends Controller
         //入力チェック
         try {
             $credentials = $request->validate([
-                'mailAddress' => 'required|max:50',
-                'password' => 'required|max:50',
+                // 'mailAddress' => 'required|max:200|email:strict,dns,spoof|string',
+                'mailAddress' => 'required|max:200|string',
+                // 'password' => 'required|max:32|not_regex:' . Consts::REGEX_PASSWORD,
             ]);
         } catch (ValidationException $e) {
             return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
         }
+        
+        //メールアドレスチェック
+        if ($this->checkAddress($request->mailAddress)) {
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => "MailAddress"]);
+        }
+
         $mess = $request->mailAddress . " " . $request->password;
 
         if (Auth::attempt(['mail_address' => $request->mailAddress, 'password' => $request->password])) {
@@ -601,6 +653,8 @@ final class CookieAuthenticationController extends Controller
             $credentials = $request->validate([
                 'twitterId' => 'required',
                 'twitterCode' => 'required',
+                'twitterToken' => 'required',
+                'twitterTokenSecret' => 'required',
             ]);
         } catch (ValidationException $e) {
             return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
@@ -610,7 +664,55 @@ final class CookieAuthenticationController extends Controller
         $userData = user::where('twitter_id', $request->twitterId)->first();
 
         if ($userData == null) {
-            //データがない場合、新規作成
+            //対象データなし
+            return response()->json(['status' => Consts::API_FAILED_NODATA, 'errMsg' => ""]);
+        } else {
+            //twitterCodeを更新
+            $userData->twitter_code = $request->twitterCode;
+            $userData->twitter_token = $request->twitterToken;
+            $userData->twitter_token_secret = $request->twitterTokenSecret;
+            $flg = $userData->save();
+
+            if (!$flg) {
+                //更新エラー
+                return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => 'twitterCode更新エラー']);
+            }
+
+            //データがある場合、ログイン成功
+            try {
+                Auth::login($userData);                
+            } catch (AuthenticationException $e) {
+                return response()->json(['status' => Consts::API_FAILED_LOGIN]);
+            }
+            return response()->json(['status' => Consts::API_SUCCESS]);
+        }
+    }
+
+    //
+    //登録処理（Twitter）
+    //
+    public function registerTwitter(Request $request): JsonResponse
+    {
+        //入力チェック
+        try {
+            $credentials = $request->validate([
+                'twitterId' => 'required',
+                'twitterCode' => 'required',
+                'twitterToken' => 'required',
+                'twitterTokenSecret' => 'required',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+        }
+
+        //ユーザーテーブルから該当を取得
+        $userData = user::where('twitter_id', $request->twitterId)->first();
+        
+        if ($userData != null) {
+            //登録済みの場合
+            return response()->json(['status' => Consts::API_FAILED_DUPLICATE, 'errMsg' => ""]);
+        } else {
+            //新規作成
             //ユーザーID生成
             $randomStr = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             $userId = "";
@@ -633,13 +735,18 @@ final class CookieAuthenticationController extends Controller
             $userName = $request->twitterName;
             $iconUrl = $request->twitterIconUrl;
             $twitterCode = $request->twitterCode;
+            $twitterToken = $request->twitterToken;
+            $twitterTokenSecret = $request->twitterTokenSecret;
             
             //データ挿入
             $newUser = new user;
             $newUser->user_id = $userId;
             $newUser->user_name = $userName;
+            $newUser->profile = "はじめまして";
             $newUser->twitter_id = $twitterId;
             $newUser->twitter_code = $twitterCode;
+            $newUser->twitter_token = $twitterToken;
+            $newUser->twitter_token_secret = $twitterTokenSecret;
             $newUser->mail_address = '';
             $newUser->password = '';
             $newUser->email_verified_at = date("Y/m/d H:i:s");
@@ -658,23 +765,6 @@ final class CookieAuthenticationController extends Controller
                 return response()->json(['status' => Consts::API_FAILED_LOGIN]);
             }
 
-            return response()->json(['status' => Consts::API_SUCCESS]);
-        } else {
-            //twitterCodeを更新
-            $userData->twitter_code = $request->twitterCode;
-            $flg = $userData->save();
-
-            if (!$flg) {
-                //更新エラー
-                return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => 'twitterCode更新エラー']);
-            }
-
-            //データがある場合、ログイン成功
-            try {
-                Auth::login($userData);                
-            } catch (AuthenticationException $e) {
-                return response()->json(['status' => Consts::API_FAILED_LOGIN]);
-            }
             return response()->json(['status' => Consts::API_SUCCESS]);
         }
     }

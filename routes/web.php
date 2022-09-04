@@ -28,6 +28,7 @@ Route::get('/api/hash', [CookieAuthenticationController::class, 'getHash']);
 Route::post('/api/m_login', [CookieAuthenticationController::class, 'loginMail']);
 Route::post('/api/t_login', [CookieAuthenticationController::class, 'loginTwitter']);
 
+Route::post('/api/registerTwitter', [CookieAuthenticationController::class, 'registerTwitter']);
 Route::post('/api/requestRegister', [CookieAuthenticationController::class, 'requestRegister']);
 Route::post('/api/register', [CookieAuthenticationController::class, 'register']);
 
@@ -40,9 +41,11 @@ Route::get('/api/isauth', [CookieAuthenticationController::class, 'isAuth']);
 Route::get('/api/logout', [CookieAuthenticationController::class, 'logout']);
 
 Route::post('/api/getMySeriesList', [DreamController::class, 'getMySeriesList']);
-Route::get('/api/test', [DreamController::class, 'test']);
+
+Route::post('/api/contact', [DreamController::class, 'contact']);
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/api/test', [DreamController::class, 'test']);
 
     Route::get('/api/getBaseInfo', [DreamController::class, 'getBaseInfo']);
 
@@ -67,6 +70,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/api/updateSettingBase', [DreamController::class, 'updateSettingBase']);
     Route::post('/api/updateSettingFavorite', [DreamController::class, 'updateSettingFavorite']);
     Route::post('/api/updateSettingMute', [DreamController::class, 'updateSettingMute']);
+    Route::post('/api/updateSettingShowTwitter', [DreamController::class, 'updateSettingShowTwitter']);
     Route::post('/api/deleteUser', [DreamController::class, 'deleteUser']);
 
     Route::post('/api/reqAuthMail', [CookieAuthenticationController::class, 'requestRegister']);
@@ -82,6 +86,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/api/updateBookmark', [DreamController::class, 'updateBookmark']);
     Route::post('/api/getMyPostData', [DreamController::class, 'getMyPostData']);
     Route::post('/api/addStamp', [DreamController::class, 'addStamp']);
+
+    Route::post('/api/getTwitterInfo', [DreamController::class, 'getTwitterInfo']);
+    Route::post('/api/checkPublishing', [DreamController::class, 'checkPublishing']);
 });
 
 Route::get('/{any}', function () {

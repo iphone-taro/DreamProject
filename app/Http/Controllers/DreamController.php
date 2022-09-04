@@ -21,8 +21,24 @@ use App\Consts\Consts;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\MailMgr;
 
+use Abraham\TwitterOAuth\TwitterOAuth;
+
 class DreamController extends Controller
 {   
+    //
+    //表現規制チェック
+    //
+    public function checkRegulation($str) {
+        $regulationArray = array("穢多","キ印","黒んぼ","新平民","鮮人","育ちより氏","チャンコロ","チョン","土人","南鮮","半島人","非人");
+
+        for ($i=0; $i < count($regulationArray); $i++) { 
+            if (strpos($str, $regulationArray[$i]) == true) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     //
     //基本情報取得（認証確認含め）
     //
@@ -44,6 +60,7 @@ class DreamController extends Controller
             'favorite_tag' => $userData['favorite_tag'],
             'mute_tag' => $userData['mute_tag'],
             'mail_address' => $userData['mail_address'],
+            'show_twitter' => $userData['show_twitter'],
         );
 
         if ($userData['mail_address'] == '') {
@@ -117,7 +134,7 @@ class DreamController extends Controller
         //入力チェック
         try {
             $validatedData = $request->validate([
-                'filter' => 'required|string|size:8',
+                'filter' => 'required|string|size:13',
             ]);
         } catch (ValidationException $e) {
             return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
@@ -139,8 +156,13 @@ class DreamController extends Controller
 		$fRating0 = substr($filterStr, 3, 1);
 		$fRating1 = substr($filterStr, 4, 1);
 		$fRating2 = substr($filterStr, 5, 1);
-		$fCreation0 = substr($filterStr, 6, 1);
-		$fCreation1 = substr($filterStr, 7, 1);
+		$fChara0 = substr($filterStr, 6, 1);
+		$fChara1 = substr($filterStr, 7, 1);
+		$fChara2 = substr($filterStr, 8, 1);
+		$fCreation0 = substr($filterStr, 9, 1);
+		$fCreation1 = substr($filterStr, 10, 1);
+		$fConversion0 = substr($filterStr, 11, 1);
+		$fConversion1 = substr($filterStr, 12, 1);
 
         if (($fOrder != 0 && $fOrder != 1 && $fOrder != 2) ||
 		($fDuration != 0 && $fDuration != 1 && $fDuration != 2 && $fDuration != 3) ||
@@ -148,8 +170,13 @@ class DreamController extends Controller
 		($fRating0 != 0 && $fRating0 != 1) ||
 		($fRating1 != 0 && $fRating1 != 1) ||
 		($fRating2 != 0 && $fRating2 != 1) ||
+		($fChara0 != 0 && $fChara0 != 1) ||
+		($fChara1 != 0 && $fChara1 != 1) ||
+		($fChara2 != 0 && $fChara2 != 1) ||
 		($fCreation0 != 0 && $fCreation0 != 1) ||
-		($fCreation1 != 0 && $fCreation1 != 1)) {
+		($fCreation1 != 0 && $fCreation1 != 1) ||
+		($fConversion0 != 0 && $fConversion0 != 1) ||
+		($fConversion1 != 0 && $fConversion1 != 1)) {
             //フィルターチェック
 			return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
 		}
@@ -173,6 +200,7 @@ class DreamController extends Controller
             char_length(`posts`.`body`) AS length,
             `posts`.`series`,
             `posts`.`rating`,
+            `posts`.`chara`,
             `posts`.`creation`,
             `posts`.`tags`,
             `posts`.`created_at`,
@@ -191,8 +219,8 @@ class DreamController extends Controller
             ON `posts`.`user_id` = `mutes`.`mute_id` 
             WHERE
             `posts`.`searchable` = 1 AND
-            `posts`.`publishing` != 99 AND 
             `mutes`.`mute_id` is null AND ";
+            // `posts`.`publishing` = 0 AND 
         
         //フィルター条件追加
         //期間
@@ -239,6 +267,32 @@ class DreamController extends Controller
             $sql = $sql . "(`posts`.`rating` = 3) AND ";
         }
 
+        //主人公
+        if ($fChara0 == 1 || $fChara1 == 1 || $fChara2 == 1) {
+            $fCharaStr = "(";
+            if ($fChara0 == 1) {
+                $fCharaStr = $fCharaStr . "`posts`.`chara` = 0 ";
+            }
+            if ($fChara1 == 1) {
+                if ($fCharaStr == "(") {
+                    $fCharaStr = $fCharaStr . "`posts`.`chara` = 1 ";
+                } else {
+                    $fCharaStr = $fCharaStr . "OR `posts`.`chara` = 1 ";
+                }
+            }
+            if ($fChara2 == 1) {
+                if ($fCharaStr == "(") {
+                    $fCharaStr = $fCharaStr . "`posts`.`chara` = 2 ";
+                } else {
+                    $fCharaStr = $fCharaStr . "OR `posts`.`chara` = 2 ";
+                }
+            }
+            $fCharaStr = $fCharaStr . ") AND ";
+            $sql = $sql . $fCharaStr;
+        } else {
+            $sql = $sql . "(`posts`.`chara` = 3) AND ";
+        }
+
         //創作
         if ($fCreation0 == 1 || $fCreation1 == 1) {
             $fCreationStr = "(";
@@ -258,6 +312,25 @@ class DreamController extends Controller
             $sql = $sql . "(`posts`.`creation` = 2) AND ";
         }
 
+        //名前変換
+        if ($fConversion0 == 1 || $fConversion1 == 1) {
+            $fConversionStr = "(";
+            if ($fConversion0 == 1) {
+                $fConversionStr = $fConversionStr . "`posts`.`conversion` != '' ";
+            }
+            if ($fConversion1 == 1) {
+                if ($fConversionStr == "(") {
+                    $fConversionStr = $fConversionStr . "`posts`.`conversion` = '' ";
+                } else {
+                    $fConversionStr = $fConversionStr . "OR `posts`.`conversion` = '' ";
+                }
+            }
+            $fConversionStr = $fConversionStr . ") AND ";
+            $sql = $sql . $fConversionStr;
+        } else {
+            $sql = $sql . "(`posts`.`conversion` = null) AND ";
+        }
+
         //検索ワード設定
 		$wordSql = "";
 		if ($wordStr != "") {
@@ -266,12 +339,21 @@ class DreamController extends Controller
 
 			for ($i = 0; $i < count($wordArray); $i++) {
                 if ($wordArray[$i] != "") {
-                    $wordSql = $wordSql . "(
-                    `posts`.`title` LIKE '%" . $wordArray[$i] . "%' OR 
-                    `posts`.`outline` LIKE '%" . $wordArray[$i] . "%' OR 
-                    `posts`.`tags` LIKE '%" . $wordArray[$i] . "%' OR 
-                    `users`.`user_name` LIKE '%" . $wordArray[$i] . "%' OR 
-                    `posts`.`series` LIKE '%" . $wordArray[$i] . "%' ) AND ";
+                    $word = $wordArray[$i];
+                    //タグかどうか
+                    if (mb_substr($word, 0, 1) == "#") {
+                        //タグ
+                        $word = mb_substr($word, 1);
+                        $wordSql = $wordSql . "(CONCAT(',', `posts`.`tags`, ',') LIKE '%," . $word . ",%') AND ";
+                    } else {
+                        //タグじゃない
+                        $wordSql = $wordSql . "(
+                            `posts`.`title` LIKE '%" . $wordArray[$i] . "%' OR 
+                            `posts`.`outline` LIKE '%" . $wordArray[$i] . "%' OR 
+                            `posts`.`tags` LIKE '%" . $wordArray[$i] . "%' OR 
+                            `users`.`user_name` LIKE '%" . $wordArray[$i] . "%' OR 
+                            `posts`.`series` LIKE '%" . $wordArray[$i] . "%' ) AND ";        
+                    }
                 }
 			}
             $sql = $sql . $wordSql;
@@ -290,12 +372,7 @@ class DreamController extends Controller
 				} else if ($muteArray[$i] == "R-18G") {
 					$muteSql = $muteSql . "(`posts`.`rating` != 2) AND ";
 				} else {
-					$muteSql = $muteSql . "(
-						`posts`.`title` NOT LIKE '%" . $muteArray[$i] . "%' AND 
-						`posts`.`outline` NOT LIKE '%" . $muteArray[$i] . "%' AND 
-						`posts`.`tags` NOT LIKE '%" . $muteArray[$i] . "%' AND 
-						`users`.`user_name` NOT LIKE '%" . $muteArray[$i] . "%' AND 
-						`posts`.`series` NOT LIKE '%" . $muteArray[$i] . "%' ) AND ";		
+					$muteSql = $muteSql . "(CONCAT(',', `posts`.`tags`, ',') NOT LIKE '%," . $muteArray[$i] . ",%') AND ";		
 				}
 			}
             $sql = $sql . $muteSql;
@@ -316,15 +393,15 @@ class DreamController extends Controller
         } else if ($fOrder == 2) {
             $sql = $sql . "ORDER BY `book` DESC, `posts`.`created_at` DESC ";
         }
-
+        
         //件数
         $sql = $sql . "LIMIT " . $start . ", 10";
-        $retArray = $retArray + array('sql' => $sql);
 
         //対象データ取得
         $dataSql = $sqlInit . $sql;
         $postList = \DB::select($dataSql);
 
+        $retArray = $retArray + array('sql' => $dataSql);
         $retArray = $retArray + array('count' => $postCount[0]->abc);
         $retArray = $retArray + array('postList' => $postList);
         $retArray = $retArray + array('status' => Consts::API_SUCCESS);
@@ -346,6 +423,7 @@ class DreamController extends Controller
              char_length(posts.body) AS length,
              posts.series,
              posts.rating,
+             posts.chara,
              posts.creation,
              posts.tags,
              posts.filter,
@@ -381,6 +459,7 @@ class DreamController extends Controller
              char_length(posts.body) AS len,
              posts.series,
              posts.rating,
+             posts.chara,
              posts.creation,
              posts.tags,
              posts.filter,
@@ -427,10 +506,10 @@ class DreamController extends Controller
         //入力チェック
         try {
             $validatedData = $request->validate([
-                'title' => ['required'],
-                'outline' => ['required'],
-                'body' => ['required'],
-                'series' => ['required'],
+                'title' => 'required|max:50',
+                'outline' => 'required|max:200',
+                'body' => 'required|max:20000',
+                'series' => 'required|max:50',
             ]);
         } catch (ValidationException $e) {
             return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
@@ -443,26 +522,101 @@ class DreamController extends Controller
         $conversion = $request->conversion;
         $series = $request->series;
         $rating = $request->rating;
+        $chara = $request->chara;
         $creation = $request->creation;
         $tags = $request->tags;
         $filter = $request->filter;
         $publishing = $request->publishing;
+        $publishingSub1 = $request->publishingSub1;
+        $publishingSub2 = $request->publishingSub2;
         $searchable = $request->searchable;
         
-        if ($searchable == true) {
+        if ($searchable == "true") {
             $searchable = 1;
         } else {
             $searchable = 0;
         }
+        
+        //表現規制チェック
+        if (!$this->checkRegulation($title) || !$this->checkRegulation($outline) || !$this->checkRegulation($body) || !$this->checkRegulation($series)) {
+            //異常値エラー
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+        }
 
         //異常値チェック
         if (($rating != 0 && $rating != 1 && $rating != 2) || 
+        ($chara != 0 && $chara != 1 && $chara != 2) ||
         ($creation != 0 && $creation != 1) ||
-        ($filter != 0 && $filter != 1 && $filter != 2 && $filter != 3) ||
-        ($publishing != 0 && $publishing != 99) ||
+        ($filter != 0 && $filter != 1 && $filter != 2 && $filter != 3 && $filter != 4) ||
+        ($publishing != 0 && $publishing != 1 && $publishing != 2 && $publishing != 3 && $publishing != 4 && $publishing != 99) ||
         ($searchable != 0 && $searchable != 1)) {
             //異常値エラー
             return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+        }
+
+        //公開方法別チェック
+        if ($publishing == 1) {
+            //パスワード
+            try {
+                $validatedData = $request->validate([
+                    'publishingSub1' => 'required|max:200',
+                    'publishingSub2' => 'required|max:200',
+                ]);
+            } catch (ValidationException $e) {
+                return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            }
+        } else if ($publishing == 4) {
+            //リスト
+            try {
+                $validatedData = $request->validate([
+                    'publishingSub1' => 'required|max:200',
+                ]);
+            } catch (ValidationException $e) {
+                return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            }
+            $publishingSub2 = "";
+        } else {
+            //それ以外　（リツイートは後で）
+            $publishingSub1 = "";
+            $publishingSub2 = "";
+        }
+
+        //変換項目チェック
+        if ($conversion != "") {
+            $conversionArray = explode(Consts::CONVERSION2, $conversion);
+            if (count($conversionArray) > 4) {
+                //異常値エラー
+                return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+            }
+            for ($i=0; $i < count($conversionArray); $i++) { 
+                $con = explode(Consts::CONVERSION1, $conversionArray[$i]);
+                if ($con[0] == "" || $con[1] == "" || mb_strlen($con[0]) > 10 || mb_strlen($con[1]) > 20) {
+                    //異常値エラー
+                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                } else if (!$this->checkRegulation($con[0]) || !$this->checkRegulation($con[1])) {
+                    //異常値エラー
+                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                } 
+            }
+        }
+
+        //ジャンルタグチェック
+        $tagStr = "";
+        if ($tags != "") {
+            $tagArray = explode(',', $tags);
+            if (count($tagArray) > 8) {
+                //異常値エラー
+                return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+            }
+            for ($i=0; $i < count($tagArray); $i++) { 
+                if (mb_strlen($tagArray[$i]) > 21) {
+                    //異常値エラー
+                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                } else if (!$this->checkRegulation($tagArray[$i])) {
+                    //異常値エラー
+                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                } 
+            }
         }
 
         //post_id生成
@@ -491,11 +645,14 @@ class DreamController extends Controller
         $postData->body = $body;
         $postData->conversion = $conversion;
         $postData->series = $series;
+        $postData->chara = $chara;
         $postData->rating = $rating;
         $postData->creation = $creation;
         $postData->tags = $tags;
         $postData->filter = $filter;
         $postData->publishing = $publishing;
+        $postData->publishing_sub1 = $publishingSub1;
+        $postData->publishing_sub2 = $publishingSub2;
         $postData->searchable = $searchable;
         $postData->save();
 
@@ -526,11 +683,102 @@ class DreamController extends Controller
         $conversion = $request->conversion;
         $series = $request->series;
         $rating = $request->rating;
+        $chara = $request->chara;
         $creation = $request->creation;
         $tags = $request->tags;
         $filter = $request->filter;
         $publishing = $request->publishing;
+        $publishingSub1 = $request->publishingSub1;
+        $publishingSub2 = $request->publishingSub2;
         $searchable = $request->searchable;
+        
+        if ($searchable == "true") {
+            $searchable = 1;
+        } else {
+            $searchable = 0;
+        }
+
+        //表現規制チェック
+        if (!$this->checkRegulation($title) || !$this->checkRegulation($outline) || !$this->checkRegulation($body) || !$this->checkRegulation($series)) {
+            //異常値エラー
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+        }
+        
+        //異常値チェック
+        if (($rating != 0 && $rating != 1 && $rating != 2) || 
+        ($chara != 0 && $chara != 1 && $chara != 2) ||
+        ($creation != 0 && $creation != 1) ||
+        ($filter != 0 && $filter != 1 && $filter != 2 && $filter != 3 && $filter != 4) ||
+        ($publishing != 0 && $publishing != 1 && $publishing != 2 && $publishing != 3 && $publishing != 4 && $publishing != 99) ||
+        ($searchable != 0 && $searchable != 1)) {
+            //異常値エラー
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+        }
+
+        //公開方法別チェック
+        if ($publishing == 1) {
+            //パスワード
+            try {
+                $validatedData = $request->validate([
+                    'publishingSub1' => 'required|max:200',
+                    'publishingSub2' => 'required|max:200',
+                ]);
+            } catch (ValidationException $e) {
+                return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            }
+        } else if ($publishing == 4) {
+            //リスト
+            try {
+                $validatedData = $request->validate([
+                    'publishingSub1' => 'required|max:200',
+                ]);
+            } catch (ValidationException $e) {
+                return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            }
+            $publishingSub2 = "";
+        } else {
+            //それ以外　（リツイートは後で）
+            $publishingSub1 = "";
+            $publishingSub2 = "";
+        }
+
+        //変換項目チェック
+        if ($conversion != "") {
+            $conversionArray = explode(Consts::CONVERSION2, $conversion);
+            if (count($conversionArray) > 4) {
+                //異常値エラー
+                return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+            }
+            
+            for ($i=0; $i < count($conversionArray); $i++) { 
+                $con = explode(Consts::CONVERSION1, $conversionArray[$i]);
+                if ($con[0] == "" || $con[1] == "" || mb_strlen($con[0]) > 10 || mb_strlen($con[1]) > 20) {
+                    //異常値エラー
+                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                } else if (!$this->checkRegulation($con[0]) || !$this->checkRegulation($con[1])) {
+                    //異常値エラー
+                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                } 
+            }    
+        }
+
+        //ジャンルタグチェック
+        if ($tags != "") {
+            $tagArray = explode(',', $tags);
+            if (count($tagArray) > 8) {
+                //異常値エラー
+                return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+            }
+            for ($i=0; $i < count($tagArray); $i++) { 
+                if (mb_strlen($tagArray[$i]) > 20) {
+                    //異常値エラー
+                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                } else if (!$this->checkRegulation($tagArray[$i])) {
+                    //異常値エラー
+                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                } 
+            }
+        }
 
         //既存データ取得
         $postData = post::where('post_id', $postId)->first();
@@ -540,15 +788,6 @@ class DreamController extends Controller
             return response()->json(['status' => Consts::API_FAILED_NODATA, 'errMsg' => $request->postId]);
         }
 
-        //異常値チェック
-        if (($rating != 0 && $rating != 1 && $rating != 2) || 
-        ($creation != 0 && $creation != 1) ||
-        ($filter != 0 && $filter != 1 && $filter != 2 && $filter != 3) ||
-        ($publishing != 0 && $publishing != 99) ||
-        ($searchable != 0 && $searchable != 1)) {
-            //異常値エラー
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
-        }
 
         //情報を更新
         $postData->title = $title;
@@ -557,10 +796,13 @@ class DreamController extends Controller
         $postData->conversion = $conversion;
         $postData->series = $series;
         $postData->rating = $rating;
+        $postData->chara = $chara;
         $postData->creation = $creation;
         $postData->tags = $tags;
         $postData->filter = $filter;
         $postData->publishing = $publishing;
+        $postData->publishing_sub1 = $publishingSub1;
+        $postData->publishing_sub2 = $publishingSub2;
         $postData->searchable = $searchable;
         $postData->save();
 
@@ -595,8 +837,12 @@ class DreamController extends Controller
         $retArray = $retArray + array('user_name' => $targetUserData->user_name);
         $retArray = $retArray + array('user_profile' => $targetUserData->profile);
 
-
-
+        $twitterCode = $targetUserData->twitter_code;
+        if ($targetUserData->show_twitter == 0 || $targetUserData->twitter_code == "") {
+            $twitterCode = "";
+        }
+        $retArray = $retArray + array('twitter_code' => $twitterCode);
+        
         //対象をフォローしているか
         $followData = follow::where('user_id', $userId)->where('follow_id', $targetId)->first();
         if ($followData != null) {
@@ -620,6 +866,7 @@ class DreamController extends Controller
             char_length(`posts`.`body`) AS len,
             `posts`.`series`,
             `posts`.`rating`,
+            `posts`.`chara`,
             `posts`.`creation`,
             `posts`.`tags`,
             `posts`.`filter`,
@@ -751,12 +998,13 @@ class DreamController extends Controller
         //入力チェック
         try {
             $validateArray = [
-                'userName' => ['required'],
+                'userName' => 'required|max:10',
+                'profile' => 'required|max:400',
             ];
     
             if ($file != null) {
                 //アイコン添付あり
-                $validateArray += array('iconFile' => 'max:1024|mimes:jpg,jpeg,png');
+                $validateArray += array('iconFile' => 'max:512|mimes:jpg,jpeg,png');
             }
 
             $validatedData = $request->validate($validateArray);
@@ -769,6 +1017,12 @@ class DreamController extends Controller
         // $file = $request->file('iconFile']['tmp_name'];
         $file = $request->file('iconFile');
         $fileName = $request->iconFileName;
+
+        //表現規制チェック
+        if (!$this->checkRegulation($userName) || !$this->checkRegulation($profile)) {
+            //異常値エラー
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+        }
 
         //ユーザー情報を取得
         $userData = Auth::User();
@@ -796,6 +1050,24 @@ class DreamController extends Controller
     public function updateSettingFavorite(Request $request): JsonResponse {
         $favorite = $request->favorite;
 
+        //タグチェック
+        if ($favorite != "") {
+            $tagArray = explode(',', $favorite);
+            if (count($tagArray) > 8) {
+                //異常値エラー
+                return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+            }
+            for ($i=0; $i < count($tagArray); $i++) { 
+                if (mb_strlen($tagArray[$i]) > 20) {
+                    //異常値エラー
+                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                } else if (!$this->checkRegulation($tagArray[$i])) {
+                    //異常値エラー
+                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                } 
+            }
+        }
+
         //ユーザー情報を取得
         $userData = Auth::User();
 
@@ -813,11 +1085,51 @@ class DreamController extends Controller
     public function updateSettingMute(Request $request): JsonResponse {
         $mute = $request->mute;
 
+        //タグチェック
+        if ($mute != "") {
+            $tagArray = explode(',', $mute);
+            if (count($tagArray) > 8) {
+                //異常値エラー
+                return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+            }
+            for ($i=0; $i < count($tagArray); $i++) { 
+                if (mb_strlen($tagArray[$i]) > 20) {
+                    //異常値エラー
+                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                } else if (!$this->checkRegulation($tagArray[$i])) {
+                    //異常値エラー
+                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                } 
+            }
+        }
+
         //ユーザー情報を取得
         $userData = Auth::User();
 
         //情報を更新
         $userData->mute_tag = $mute;
+        // $userData->updated_at = date("Y/m/d H:i:s");
+        $userData->update();
+
+        return response()->json(['status' => Consts::API_SUCCESS, 'baseInfo' => $this->retUserInfo()]);
+    }
+
+    //
+    //設定 － Twitterアカウント表示更新
+    //
+    public function updateSettingShowTwitter(Request $request): JsonResponse {
+        $showTwitter = $request->showTwitter;
+        if ($showTwitter == "true") {
+            $showTwitter = 1;
+        } else {
+            $showTwitter = 0;
+        }
+        
+        //ユーザー情報を取得
+        $userData = Auth::User();
+
+        //情報を更新
+        $userData->show_twitter = $showTwitter;
         // $userData->updated_at = date("Y/m/d H:i:s");
         $userData->update();
 
@@ -859,10 +1171,13 @@ class DreamController extends Controller
             char_length(posts.body) AS len,
             posts.series,
             posts.rating,
+            posts.chara,
             posts.creation,
             posts.tags,
             posts.filter,
             posts.publishing,
+            posts.publishing_sub1,
+            posts.publishing_sub2,
             posts.created_at,
             posts.conversion,
             CASE WHEN bookmarks.user_id IS NULL THEN 0 ELSE 1 END AS bookmark
@@ -883,9 +1198,22 @@ class DreamController extends Controller
 
         $postData = $postData[0];
 
-        if ($postData->publishing == "99") {
+        //公開方法別処理
+        if ($postData->publishing == "1") {
+            //答え空白
+            $postData->publishing_sub1 = "";
+        } else if ($postData->publishing == "4") {
+            //リスト空白
+            $postData->publishing_sub1 = "";
+        } else if ($postData->publishing == "99") {
             //非公開の場合
             return response()->json(['status' => Consts::API_FAILED_PRIVATE, 'errMsg' => '非公開データ']);
+        }
+
+        //本文の扱い
+        if ($postData->user_id != auth::User()->user_id && $postData->publishing != "0") {
+            //自分のデータ　または　全体公開　じゃない場合
+            $postData->body = "";
         }
 
         $retArray = $retArray + array('postData' => $postData);
@@ -939,18 +1267,28 @@ class DreamController extends Controller
         try {
             $validatedData = $request->validate([
                 'postId' => ['required'],
+                'userId' => ['required'],
                 'stamp' => ['required'],
             ]);
         } catch (ValidationException $e) {
             return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
         }
 
+        //スタンプの上限確認
+        $stampList = Stamp::where('post_id', $request->postId)->where('user_id', $request->userId)->get();
+
+        if (count($stampList) >= 10) {
+            //スタンプ上限
+            return response()->json(['status' => Consts::API_FAILED_LIMIT, 'msg' => ""]);
+        }
+        // dd(count($stampList));
         DB::table('stamps')->insert([
             'post_id' => $request->postId,
+            'user_id' => $request->userId,
             'stamp_id' => $request->stamp
         ]);
 
-        return response()->json(['status' => Consts::API_SUCCESS, 'baseInfo' => $this->retUserInfo()]);
+        return response()->json(['status' => Consts::API_SUCCESS, 'baseInfo' => $this->retUserInfo(), 'count' => count($stampList) + 1]);
     }
 
     //
@@ -965,7 +1303,7 @@ class DreamController extends Controller
         } catch (ValidationException $e) {
             return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
         }
-
+        
         //投稿データ取得
         $postData = \DB::select('
             SELECT
@@ -976,10 +1314,13 @@ class DreamController extends Controller
             posts.conversion,
             posts.series,
             posts.rating,
+            posts.chara,
             posts.creation,
             posts.tags,
             posts.filter,
             posts.publishing,
+            posts.publishing_sub1,
+            posts.publishing_sub2,
             posts.searchable 
             from
             posts
@@ -991,6 +1332,13 @@ class DreamController extends Controller
         }
 
         $postData = $postData[0];
+
+        //公開方法が「リスト限定」の場合、Twitterリストを取得する
+        $twitterList = null;
+        if ($postData->publishing == 4 && Auth::User()->twitter_id != "") {
+            //リストの取得
+            $twitterList = $this->retTwitterData("TWITTER_LIST", Auth::User()->twitter_id);
+        }
 
         //シリーズ一覧取得
         $seriesList = array("指定なし");
@@ -1008,7 +1356,7 @@ class DreamController extends Controller
             }
         }
 
-        return response()->json(['status' => Consts::API_SUCCESS, 'postData' => $postData, 'seriesList' => $seriesList, 'baseInfo' => $this->retUserInfo()]);
+        return response()->json(['status' => Consts::API_SUCCESS, 'postData' => $postData, 'seriesList' => $seriesList, 'twitterList' => $twitterList, 'baseInfo' => $this->retUserInfo()]);
     }
 
     //
@@ -1032,13 +1380,318 @@ class DreamController extends Controller
         return response()->json(['status' => Consts::API_SUCCESS, 'baseInfo' => $this->retUserInfo()]);
     }
 
-    public function test() {
-        $title = '太郎テスト';
-        $body = 'ほんぶんほんぶんほんぶんほんぶんほんぶんほんぶんほんぶんほんぶんほんぶんほんぶん';
-        $email = 'saga.siga.noga@gmail.com';
+    //
+    //お問い合わせ
+    //
+    public function contact(Request $request): JsonResponse {
+        //入力チェック
+        try {
+            $validatedData = $request->validate([
+                'name' => 'required',
+                'mailAddress' => 'required|max:200|email:strict,dns,spoof|string',
+                'phoneNumber' => 'numeric',
+                'body' => 'required',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+        } 
 
-        Mail::send(new MailMgr($title, $body, $email));
+        //メール本文作成
+        $mailBody = "お名前：" . $request->name . "\r\n";
+        $mailBody = $mailBody . "メールアドレス：" . $request->mailAddress . "\r\n";
+        $mailBody = $mailBody . "電話番号：" . $request->phoneNumber . "\r\n";
+        $mailBody = $mailBody . "内容：" . $request->body . "\r\n";
+        $mailBody = $mailBody . "日時：" . date("Y-m-d H:i:s") . "\r\n";
+        
+        try {
+            Mail::send(new MailMgr("お問い合わせ", $mailBody, "saga.siga.noga@gmail.com"));
+        } catch (Exception $e) {
+            return response()->json(['status' => Consts::API_FAILED_EXEPTION, 'errMsg' => 'リセット申請エラー']);
+        }
+        return response()->json(['status' => Consts::API_SUCCESS]); 
+    }
 
-        dd("OK");
+    //
+    //Twitter情報取得
+    //
+    public function getTwitterInfo(Request $request): JsonResponse {
+        //入力チェック
+        try {
+            $validatedData = $request->validate([
+                'kbn' => 'required',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+        }
+
+        //取得情報別処理
+        if ($request->kbn == "TWITTER_LIST") {
+            $twitterList = $this->retTwitterData($request->kbn, Auth::User()->twitter_id);
+            return response()->json(['twitterList' => $twitterList]);
+        }
+    }
+
+    public function retTwitterData($kbn, $param) {
+        $api_key = Consts::TWITTER_API_KEY;		// APIキー
+        $api_secret = Consts::TWITTER_API_SECRET;		// APIシークレット
+
+        $userData = Auth::User();
+        $access_token = $userData->twitter_token;		// アクセストークン
+        $access_token_secret = $userData->twitter_token_secret;		// アクセストークンシークレット   
+
+        $twObj = new TwitterOAuth($api_key,$api_secret,$access_token,$access_token_secret);
+
+        $retList = array();
+        if ($kbn == "TWITTER_LIST") {
+            //公開リストの取得
+            $apiData = $twObj->get("lists/list", ["user_id" => $param]);
+            if (gettype($apiData) == "array") {
+                //配列の場合
+                $list = array();
+                foreach ($apiData as $data) {
+                    array_push($list, ['id' => "$data->id", 'name' => $data->name]);
+                }
+                $retList += array('status' => '1');
+                $retList += array('list' => $list);
+                return $retList;    
+            } else if (gettype($apiData) == "object") {
+                //オブジェクトの場合　データ取得上限
+                $retList += array('status' => '0');
+                $retList += array('list' => null);
+                return $retList;
+            }
+        } else if ($kbn == "TWITTER_LIST_MEMBER") {
+            //公開リストの取得
+            $apiData = $twObj->get("lists/members/show", ["list_id" => $param, "user_id" => Auth::User()->twitter_id]);
+            if (property_exists($apiData, 'errors')) {
+                if ($apiData->errors[0]->code == '109') {
+                    //メンバーじゃない
+                    return "L1";
+                } else if ($apiData->errors[0]->code == '34') {
+                    //リストなし
+                    return "L2";
+                } else if ($apiData->errors[0]->code == '88') {
+                    //取得上限
+                    return "99";
+                }
+            } else {
+                //メンバー
+                return "1";
+            }
+        }  else if ($kbn == "FRIENDSHIP") {
+            $apiData = $twObj->get("friendships/lookup", ["user_id" => $param]);
+            if (property_exists($apiData, 'errors')) {
+                return null;
+            }
+            $retList = [0, 0];
+            foreach ($apiData as $data) {
+                $connections = $data->connections;
+                foreach ($connections as $val) {
+                    if ($val == "following") {
+                        $retList[0] = 1;
+                    } else if ($val == "followed_by") {
+                        $retList[1] = 1;
+                    }
+                }
+            }
+            return $retList;
+        }
+    }
+
+    // 
+    // 公開方法別の照合
+    //
+    public function checkPublishing(Request $request): JsonResponse {
+        //入力チェック
+        try {
+            $validatedData = $request->validate([
+                'kbn' => 'required',
+                'postId' => 'required',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+        }
+        
+        $kbn = $request->kbn;
+        $postId = $request->postId;
+
+        $retList = array();
+
+        $postData =  post::where('post_id', $postId)->first();
+
+        if ($postData == null) {
+            //データなし
+            return response()->json(['status' => Consts::API_FAILED_NODATA, 'msg' => ""]);
+        } else if ($postData->pupblishing == "99") {
+            //非公開
+            return response()->json(['status' => Consts::API_FAILED_PRIVATE, 'msg' => ""]);
+        }
+        
+        if (($postData->publishing == "1" && $kbn != "PASSWORD") || ($postData->publishing == "2" && $kbn != "TWITTER_SOUGO") || 
+        ($postData->publishing == "3" && $kbn != "TWITTER_FOLLOW") || ($postData->publishing == "4" && $kbn != "TWITTER_LIST")) {
+            //パラメータと公開方法が違う場合
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+        }
+        //公開方法別処理
+        if ($kbn == "PASSWORD") {
+            //パスワード
+            //追加バリデート
+            try {
+                $validatedData = $request->validate([
+                    'password' => 'required',
+                ]);
+            } catch (ValidationException $e) {
+                return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            }
+            $password = $request->password;
+
+            if ($postData->publishing_sub1 == $password) {
+                //正解
+                $retList += array('status' => Consts::API_SUCCESS);
+                $retList += array('body' => $postData->body);
+            } else {
+                //不正解
+                $retList += array('status' => Consts::API_FAILED_PUBLISHING);
+                $retList += array('error' => "P1");
+            }
+        } else if ($kbn == "TWITTER_SOUGO" || $kbn == "TWITTER_FOLLOW" || $kbn == "TWITTER_LIST") {
+            //twitter連携
+            $authorUserId = $postData->user_id;
+            $authorData = user::where('user_id', $authorUserId)->first();
+
+            if ($authorData == null) {
+                //著者データなし
+                return response()->json(['status' => Consts::API_FAILED_NODATA, 'msg' => "NULL_AUTHOR"]);
+            } else if ($authorData->twitter_id == "") {
+                //著者Twitter非認証
+                return response()->json(['status' => Consts::API_FAILED_NODATA, 'msg' => "AUTH_AUTHOR"]);
+            }
+
+            if ($kbn == "TWITTER_SOUGO" || $kbn == "TWITTER_FOLLOW") {
+                //追加バリデート
+                try {
+                    $validatedData = $request->validate([
+                        'userId' => 'required',
+                    ]);
+                } catch (ValidationException $e) {
+                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+                }
+                $userId = $request->userId;
+                $userData =  user::where('user_id', $userId)->first();
+                
+                if ($userData == null) {
+                    //自ユーザなし
+                    return response()->json(['status' => Consts::API_FAILED_NODATA, 'msg' => "NULL"]);
+                } else if ($userData->twitter_id == "") {
+                    //自ユーザーTwitter非認証
+                    return response()->json(['status' => Consts::API_FAILED_NODATA, 'msg' => "AUTH"]);
+                }
+
+                $targetTwitterId = $userData->twitter_id;
+
+                //フォロー情報取得
+                $friendShip = $this->retTwitterData("FRIENDSHIP", $targetTwitterId);
+                if ($friendShip == null) {
+                    //取得上限
+                    $retList += array('status' => Consts::API_FAILED_PUBLISHING);
+                    $retList += array('error' => "99");
+                } else {
+                    if ($kbn == "TWITTER_SOUGO") {
+                        //相互フォロー
+                        if ($friendShip[0] == 1 && $friendShip[1] == 1) {
+                            //OK
+                            $retList += array('status' => Consts::API_SUCCESS);
+                            $retList += array('body' => $postData->body);
+                        } else {
+                            //NG
+                            $retList += array('status' => Consts::API_FAILED_PUBLISHING);
+                            $retList += array('error' => "S1");
+                        }
+                    } else if ($kbn == "TWITTER_FOLLOW") {
+                        //フォロワー
+                        if ($friendShip[0] == 1) {
+                            //OK
+                            $retList += array('status' => Consts::API_SUCCESS);
+                            $retList += array('body' => $postData->body);
+                        } else {
+                            //NG
+                            $retList += array('status' => Consts::API_FAILED_PUBLISHING);
+                            $retList += array('error' => "F1");
+                        }
+                    }
+                }
+            } else if ($kbn == "TWITTER_LIST") {
+                //公開リスト
+                $listId = $postData->publishing_sub1;
+                $isMember = $this->retTwitterData('TWITTER_LIST_MEMBER', $listId);
+                if ($isMember == "1") {
+                    //OK
+                    $retList += array('status' => Consts::API_SUCCESS);
+                    $retList += array('body' => $postData->body);
+                } else {
+                    //NG
+                    $retList += array('status' => Consts::API_FAILED_PUBLISHING);
+                    $retList += array('error' => $isMember);
+                }
+            }
+        }
+        $retList += array('baseInfo' => $this->retUserInfo());
+        return response()->json($retList);
+    }
+
+    // 公開リスト取得
+    // フォロー関係取得
+    //リツイート　statuses/show　のretweeted true/false
+    public function test(Request $request): JsonResponse {
+        // dd($request->aaa . "  " . $request->bbb);
+        $api_key = Consts::TWITTER_API_KEY;		// APIキー
+        $api_secret = Consts::TWITTER_API_SECRET;		// APIシークレット
+
+        $userData = Auth::User();
+        $access_token = $userData->twitter_token;		// アクセストークン
+        $access_token_secret = $userData->twitter_token_secret;		// アクセストークンシークレット   
+        // dd($access_token . " " . $access_token_secret);
+
+        $twObj = new TwitterOAuth($api_key,$api_secret,$access_token,$access_token_secret);
+        // dd(Auth::User()->twitter_id);
+        // $apiData = $twObj->get("lists/members/show", ["list_id" => "1565027332947329024", "screen_name" => "iphoneTaro_live"]);
+        $apiData = $twObj->get("lists/members/show", ["list_id" => "1565027433249927168", "screen_name" => "iphoneTaro_live"]);
+
+        if (property_exists($apiData, 'errors')) {
+            dd("リストじゃない");
+        } else {
+            dd("リストだよ");
+        }
+        // $apiData = $twObj->get("users/show", ["screen_name" => "iphoneTaro_live"]);
+        dd($apiData);
+
+        // $statuses = $twObj->get("users/lookup", ["screen_name" => "iphoneTaro_live"]);
+        // $jsonData = json_decode($statuses, true);
+        // $list = array();
+        // foreach ($apiData as $data) {
+        //     array_push($list, ['id' => $data->id, 'name' => $data->name]);
+        // }
+        // dd($list);
+
+        $vRequest = $twObj->OAuthRequest("http://api.twitter.com/1.1/friendships/lookup.xml","GET",array('screen_name' => 'kfukuda413,twitwi_info'));
+
+        //XMLデータをsimplexml_load_string関数を使用してオブジェクトに変換する
+        $oXml = simplexml_load_string($vRequest);
+
+        //オブジェクトを展開
+        if(isset($oXml->error) && $oXml->error != ''){
+            echo "取得に失敗しました。<br/>\n";
+            echo "パラメーターの指定を確認して下さい。<br/>\n";
+            echo "エラーメッセージ:".$oXml->error."<br/>\n";
+        }else{
+            foreach($oXml as $oFriendships){
+                echo "<p>自分と → <b>userid(".$oFriendships->id.") screen_name(".$oFriendships->screen_name.") username(".$oFriendships->name.")</b> との関係は、<br/>\n";
+                foreach($oFriendships->connections->connection as $connection){
+                    echo "-".$connection."<br/>\n";
+                }
+            }
+        }
+
+        return response()->json(['json' => $json, 'header' => $header]); 
     }
 }
