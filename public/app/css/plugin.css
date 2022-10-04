@@ -28,15 +28,38 @@
 #CHK label input:focus ~ .indicator{
 	background:#ccc;
 }
-#CHK label input:checked ~ .indicator{
-	background:#f28280;
+
+.theme_chk_A1 label input:checked ~ .indicator{
+	background:#f28280 !important;
 }
-#CHK label:hover input:not([disabled]):checked ~ .indicator{
-	background:#f28280;
+.theme_chk_A1 label:hover input:not([disabled]):checked ~ .indicator{
+	background:#f28280 !important;
 }
-#CHK .typeA-radio input:checked ~ .indicator{
-	background: #e87a90;
+.theme_chk_A1 .typeA-radio input:checked ~ .indicator{
+	background: #e87a90 !important;
 }
+
+.theme_chk_B1 label input:checked ~ .indicator{
+	background:#98CE97 !important;
+}
+.theme_chk_B1 label:hover input:not([disabled]):checked ~ .indicator{
+	background:#98CE97 !important;
+}
+.theme_chk_B1 .typeA-radio input:checked ~ .indicator{
+	background: #98CE97 !important;
+}
+
+.theme_chk_C1 label input:checked ~ .indicator{
+	background:#8E5E4A !important;
+}
+.theme_chk_C1 label:hover input:not([disabled]):checked ~ .indicator{
+	background:#8E5E4A !important;
+}
+.theme_chk_C1 .typeA-radio input:checked ~ .indicator{
+	background: #8E5E4A !important;
+}
+
+
 #CHK .typeA-radio:hover input:not([disabled]):checked ~ .indicator{
 	background:rgba(232,122,144,.7);
 }
@@ -78,6 +101,10 @@
 	background:#7b7b7b;
 }
 
+#CHK span {
+	padding:5px 0 0 5px
+}
+
 
 /* スイッチボタン */
  /* === ボタンを表示するエリア ============================== */
@@ -109,9 +136,21 @@
   }
   
    /* === チェックボックスのラベル（ONのとき） ================ */
-  .switchArea input[type="checkbox"]:checked +label {
+  /* .switchArea input[type="checkbox"]:checked +label { */
+	/* border-color   : #f28280;             選択タブの枠線     */
+	/* background-color: #f28280; */
+  /* } */
+  .theme_switch_1 input[type="checkbox"]:checked +label {
 	/* border-color   : #f28280;             選択タブの枠線     */
 	background-color: #f28280;
+  }
+  .theme_switch_2 input[type="checkbox"]:checked +label {
+	/* border-color   : #f28280;             選択タブの枠線     */
+	background-color: #98CE97;
+  }
+  .theme_switch_3 input[type="checkbox"]:checked +label {
+	/* border-color   : #f28280;             選択タブの枠線     */
+	background-color: #8E5E4A;
   }
   
    /* === 表示する文字（標準） ================================ */
