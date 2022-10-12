@@ -92,5 +92,8 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 Route::get('/{any}', function () {
-    return view('spa.app');
+    return view('spa.app')->with('test', "card");
 })->where('any', '.*');
+// Route::get('/{any}', function () {
+//     return view('spa.app');
+// })->where('any', '.*');

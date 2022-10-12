@@ -219,8 +219,8 @@ class DreamController extends Controller
             ON `posts`.`user_id` = `mutes`.`mute_id` 
             WHERE
             `posts`.`searchable` = 1 AND
-            `mutes`.`mute_id` is null AND ";
-            // `posts`.`publishing` = 0 AND 
+            `mutes`.`mute_id` is null AND 
+            `posts`.`publishing` = 0 AND ";
         
         //フィルター条件追加
         //期間
