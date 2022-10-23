@@ -44,6 +44,8 @@ Route::post('/api/getMySeriesList', [DreamController::class, 'getMySeriesList'])
 
 Route::post('/api/contact', [DreamController::class, 'contact']);
 
+Route::get('/api/tete', [CookieAuthenticationController::class, 'tete']);
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/api/test', [DreamController::class, 'test']);
 

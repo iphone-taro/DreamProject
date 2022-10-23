@@ -624,7 +624,7 @@ class DreamController extends Controller
         $postId = "";
         while ($postId == "") {
             for ($i = 0; $i < 20; $i++) {
-                $ch = substr($randomStr, mt_rand(0, strlen($randomStr)), 1);
+                $ch = substr($randomStr, mt_rand(0, strlen($randomStr)) - 1, 1);
                 $postId = $postId . $ch;
             }
 
@@ -1004,7 +1004,7 @@ class DreamController extends Controller
     
             if ($file != null) {
                 //アイコン添付あり
-                $validateArray += array('iconFile' => 'max:512|mimes:jpg,jpeg,png');
+                $validateArray += array('iconFile' => 'max:1024|mimes:jpg,jpeg,png');
             }
 
             $validatedData = $request->validate($validateArray);
@@ -1031,17 +1031,30 @@ class DreamController extends Controller
         $userData->user_name = $userName;
         $userData->profile = $profile;
         // $userData->updated_at = date("Y/m/d H:i:s");
-        $userData->save();
 
-        //アイコンファイルがある場合は更新
-        if ($file != null) {
-            //チェック？？？？
-            $file->storeAs('public/icon', $userData->user_id . ".png");
-        } else if ($fileName == "default") {
-            copy('./app/img/icon/icon_default.png', '../storage/app/public/icon/' . $userData->user_id . '.png');
+        try {
+            DB::beginTransaction();
+            
+            $flg = $userData->save();
+
+            if ($flg) {
+                //アイコンファイルがある場合は更新
+                if ($file != null) {
+                    $file->storeAs('public/icon', $userData->user_id . ".png");
+                } else if ($fileName == "DEFAULT") {
+                    copy('./app/img/icon/icon_default.png', '../storage/app/public/icon/' . $userData->user_id . '.png');
+                }
+
+                return response()->json(['status' => Consts::API_SUCCESS, 'baseInfo' => $userData]);
+
+            } else {
+                DB::rollBack();
+                return response()->json(['status' => Consts::API_FAILED_EXEPTION, 'errMsg' => '']);                    
+            }
+        } catch (Throwable $e) {
+            DB::rollBack();
+            return response()->json(['status' => Consts::API_FAILED_EXEPTION, 'errMsg' => '']);                
         }
-        
-        return response()->json(['status' => Consts::API_SUCCESS, 'baseInfo' => $userData]);
     }
 
     //
