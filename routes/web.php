@@ -21,6 +21,7 @@ use App\Http\Controllers\CruiseController;
 Route::get('/cruisetest', [CruiseController::class, 'test']);
 
 
+Route::get('/api/init', [CookieAuthenticationController::class, 'initAction']);
 
 
 Route::get('/api/hash', [CookieAuthenticationController::class, 'getHash']);
@@ -36,7 +37,7 @@ Route::post('/api/requestReset', [CookieAuthenticationController::class, 'reques
 Route::post('/api/resetPassword', [CookieAuthenticationController::class, 'resetPassword']);
 Route::post('/api/resetPasswordInit', [CookieAuthenticationController::class, 'resetPasswordInit']);
 
-Route::get('/api/isauth', [CookieAuthenticationController::class, 'isAuth']);
+Route::get('/api/isAuth', [CookieAuthenticationController::class, 'isAuth']);
 
 Route::get('/api/logout', [CookieAuthenticationController::class, 'logout']);
 
@@ -45,6 +46,8 @@ Route::post('/api/getMySeriesList', [DreamController::class, 'getMySeriesList'])
 Route::post('/api/contact', [DreamController::class, 'contact']);
 
 Route::get('/api/tete', [CookieAuthenticationController::class, 'tete']);
+
+
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/api/test', [DreamController::class, 'test']);

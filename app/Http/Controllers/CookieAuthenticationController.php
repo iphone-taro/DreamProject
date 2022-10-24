@@ -90,8 +90,6 @@ final class CookieAuthenticationController extends Controller
         }
     }
 
-    
-
     //
     //基本情報取得（認証確認含め）
     //
@@ -667,7 +665,10 @@ final class CookieAuthenticationController extends Controller
         //バリデート
         try {
             $validated = $request->validate([
-                'twitterId' => 'required'
+                'twitterId' => 'required',
+                'twitterCode' => 'required',
+                'twitterToken' => 'required',
+                'twitterTokenSecret' => 'required',
             ]);
         } catch (ValidationException $e) {
             return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
@@ -682,6 +683,10 @@ final class CookieAuthenticationController extends Controller
         //ユーザーデータ取得
         $userData = Auth::User();
         $userData->twitter_id = $request->twitterId;
+        $userData->twitter_code = $request->twitterCode;
+        $userData->twitter_token = $request->twitterToken;
+        $userData->twitter_token_secret = $request->twitterTokenSecret;
+
         $flg = $userData->save();
 
         if ($flg) {
