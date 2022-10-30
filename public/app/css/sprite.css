@@ -1,0 +1,163 @@
+.stamp {
+	/* display: inline-block; */
+	/* content: ""; */
+	width: 30px;
+	height: 30px;
+    display: inline-block;
+    cursor:pointer;
+	background-image: url("../img/stamp_base.png");
+	background-size: 300px 270px;
+	background-repeat: no-repeat;
+}
+
+.st001{background-position: 0px 0px}
+.st002{background-position: -30px 0px}
+.st003{background-position: -60px 0px}
+.st004{background-position: -90px 0px}
+.st005{background-position: -120px 0px}
+.st006{background-position: -150px 0px}
+.st007{background-position: -180px 0px}
+.st008{background-position: -210px 0px}
+.st009{background-position: -240px 0px}
+.st010{background-position: -270px 0px}
+.st011{background-position: 0px -30px}
+.st012{background-position: -30px -30px}
+.st013{background-position: -60px -30px}
+.st014{background-position: -90px -30px}
+.st015{background-position: -120px -30px}
+.st016{background-position: -150px -30px}
+.st017{background-position: -180px -30px}
+.st018{background-position: -210px -30px}
+.st019{background-position: -240px -30px}
+.st020{background-position: -270px -30px}
+.st021{background-position: 0px -60px}
+.st022{background-position: -30px -60px}
+.st023{background-position: -60px -60px}
+.st024{background-position: -90px -60px}
+.st025{background-position: -120px -60px}
+.st026{background-position: -150px -60px}
+.st027{background-position: -180px -60px}
+.st028{background-position: -210px -60px}
+.st029{background-position: -240px -60px}
+.st030{background-position: -270px -60px}
+.st031{background-position: 0px -90px}
+.st032{background-position: -30px -90px}
+.st033{background-position: -60px -90px}
+.st034{background-position: -90px -90px}
+.st035{background-position: -120px -90px}
+.st036{background-position: -150px -90px}
+.st037{background-position: -180px -90px}
+.st038{background-position: -210px -90px}
+.st039{background-position: -240px -90px}
+.st040{background-position: -270px -90px}
+.st041{background-position: 0px -120px}
+.st042{background-position: -30px -120px}
+.st043{background-position: -60px -120px}
+.st044{background-position: -90px -120px}
+.st045{background-position: -120px -120px}
+.st046{background-position: -150px -120px}
+.st047{background-position: -180px -120px}
+.st048{background-position: -210px -120px}
+.st049{background-position: -240px -120px}
+.st050{background-position: -270px -120px}
+.st051{background-position: 0px -150px}
+.st052{background-position: -30px -150px}
+.st053{background-position: -60px -150px}
+.st054{background-position: -90px -150px}
+.st055{background-position: -120px -150px}
+.st056{background-position: -150px -150px}
+.st057{background-position: -180px -150px}
+.st058{background-position: -210px -150px}
+.st059{background-position: -240px -150px}
+.st060{background-position: -270px -150px}
+.st061{background-position: 0px -180px}
+.st062{background-position: -30px -180px}
+.st063{background-position: -60px -180px}
+.st064{background-position: -90px -180px}
+.st065{background-position: -120px -180px}
+.st066{background-position: -150px -180px}
+.st067{background-position: -180px -180px}
+.st068{background-position: -210px -180px}
+.st069{background-position: -240px -180px}
+.st070{background-position: -270px -180px}
+.st071{background-position: 0px -210px}
+.st072{background-position: -30px -210px}
+.st073{background-position: -60px -210px}
+.st074{background-position: -90px -210px}
+.st075{background-position: -120px -210px}
+.st076{background-position: -150px -210px}
+.st077{background-position: -180px -210px}
+.st078{background-position: -210px -210px}
+.st079{background-position: -240px -210px}
+.st080{background-position: -270px -210px}
+.st081{background-position: 0px -240px}
+.st082{background-position: -30px -240px}
+.st083{background-position: -60px -240px}
+.st084{background-position: -90px -240px}
+.st085{background-position: -120px -240px}
+.st086{background-position: -150px -240px}
+.st087{background-position: -180px -240px}
+.st088{background-position: -210px -240px}
+
+
+.tab {
+	/* display: inline-block; */
+	/* content: ""; */
+	width: 22px;
+	height: 22px;
+    display: inline-block;
+    cursor:pointer;
+	background-image: url("../img/tab_base.png");
+	background-size: 88px 176px;
+	background-repeat: no-repeat;
+}
+
+.tab_bookmark_0 {background-position: 0px 0px}
+.tab_bookmark_1 {background-position: -22px 0px}
+.tab_bookmark_2 {background-position: -44px 0px}
+.tab_bookmark_3 {background-position: -66px 0px}
+.tab_edit_0 {background-position: 0px -22px}
+.tab_edit_1 {background-position: -22px -22px}
+.tab_edit_2 {background-position: -44px -22px}
+.tab_edit_3 {background-position: -66px -22px}
+.tab_follow_0 {background-position: 0px -44px}
+.tab_follow_1 {background-position: -22px -44px}
+.tab_follow_2 {background-position: -44px -44px}
+.tab_follow_3 {background-position: -66px -44px}
+.tab_info_0 {background-position: 0px -66px}
+.tab_info_1 {background-position: -22px -66px}
+.tab_info_2 {background-position: -44px -66px}
+.tab_info_3 {background-position: -66px -66px}
+.tab_postlist_0 {background-position: 0px -88px}
+.tab_postlist_1 {background-position: -22px -88px}
+.tab_postlist_2 {background-position: -44px -88px}
+.tab_postlist_3 {background-position: -66px -88px}
+.tab_search_0 {background-position: 0px -110px}
+.tab_search_1 {background-position: -22px -110px}
+.tab_search_2 {background-position: -44px -110px}
+.tab_search_3 {background-position: -66px -110px}
+.tab_setting_0 {background-position: 0px -132px}
+.tab_setting_1 {background-position: -22px -132px}
+.tab_setting_2 {background-position: -44px -132px}
+.tab_setting_3 {background-position: -66px -132px}
+
+.menu_icon_base {
+	/* display: inline-block; */
+	/* content: ""; */
+	width: 20px;
+	height: 20px;
+    display: inline-block;
+    cursor:pointer;
+	background-image: url("../img/tab_base.png");
+	background-size: 80px 160px;
+	background-repeat: no-repeat;
+}
+
+.menu_icon_bookmark {background-position: 0px -0px}
+.menu_icon_edit {background-position: 0px -20px}
+.menu_icon_follow {background-position: 0px -40px}
+.menu_icon_info {background-position: 0px -60px}
+.menu_icon_postlist {background-position: 0px -80px}
+.menu_icon_search {background-position: 0px -100px}
+.menu_icon_setting {background-position: 0px -120px}
+.menu_icon_logout {background-position: 0px -140px}
