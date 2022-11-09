@@ -108,7 +108,7 @@
     display: inline-block;
     cursor:pointer;
 	background-image: url("../img/tab_base.png");
-	background-size: 88px 176px;
+	background-size: 110px 176px;
 	background-repeat: no-repeat;
 }
 
@@ -116,30 +116,37 @@
 .tab_bookmark_1 {background-position: -22px 0px}
 .tab_bookmark_2 {background-position: -44px 0px}
 .tab_bookmark_3 {background-position: -66px 0px}
+.tab_bookmark_4 {background-position: -88px 0px}
 .tab_edit_0 {background-position: 0px -22px}
 .tab_edit_1 {background-position: -22px -22px}
 .tab_edit_2 {background-position: -44px -22px}
 .tab_edit_3 {background-position: -66px -22px}
+.tab_edit_4 {background-position: -88px -22px}
 .tab_follow_0 {background-position: 0px -44px}
 .tab_follow_1 {background-position: -22px -44px}
 .tab_follow_2 {background-position: -44px -44px}
 .tab_follow_3 {background-position: -66px -44px}
+.tab_follow_4 {background-position: -88px -44px}
 .tab_info_0 {background-position: 0px -66px}
 .tab_info_1 {background-position: -22px -66px}
 .tab_info_2 {background-position: -44px -66px}
 .tab_info_3 {background-position: -66px -66px}
+.tab_info_4 {background-position: -88px -66px}
 .tab_postlist_0 {background-position: 0px -88px}
 .tab_postlist_1 {background-position: -22px -88px}
 .tab_postlist_2 {background-position: -44px -88px}
 .tab_postlist_3 {background-position: -66px -88px}
+.tab_postlist_4 {background-position: -88px -88px}
 .tab_search_0 {background-position: 0px -110px}
 .tab_search_1 {background-position: -22px -110px}
 .tab_search_2 {background-position: -44px -110px}
 .tab_search_3 {background-position: -66px -110px}
+.tab_search_4 {background-position: -88px -110px}
 .tab_setting_0 {background-position: 0px -132px}
 .tab_setting_1 {background-position: -22px -132px}
 .tab_setting_2 {background-position: -44px -132px}
 .tab_setting_3 {background-position: -66px -132px}
+.tab_setting_4 {background-position: -88px -132px}
 
 .menu_icon_base {
 	/* display: inline-block; */
@@ -149,7 +156,7 @@
     display: inline-block;
     cursor:pointer;
 	background-image: url("../img/tab_base.png");
-	background-size: 80px 160px;
+	background-size: 100px 160px;
 	background-repeat: no-repeat;
 }
 
@@ -161,3 +168,4 @@
 .menu_icon_search {background-position: 0px -100px}
 .menu_icon_setting {background-position: 0px -120px}
 .menu_icon_logout {background-position: 0px -140px}
+.menu_icon_theme {background-position: -20px -140px}

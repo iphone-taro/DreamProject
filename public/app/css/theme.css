@@ -1,118 +1,179 @@
-@import "https://use.fontawesome.com/releases/v5.13.0/css/all.css";
-
+@import url(https://use.fontawesome.com/releases/v5.13.0/css/all.css);
+@charset "UTF-8";
 /* 背景色 */
 .bc-A1 {
-    background-color: #F28280 !important;
+  background-color: #F28280 !important;
 }
+
 .bc-A2 {
-    background-color: #FFF5F6 !important;
+  background-color: #FFF5F6 !important;
 }
+
 .bc-A3 {
-    background-color: #FFDFF3 !important;
+  background-color: #FFDFF3 !important;
 }
+
 .bc-A4 {
-    background-color: #FFD3D7 !important;
+  background-color: #FFD3D7 !important;
 }
 
 .bc-B1 {
-    background-color: #98CE97 !important;
+  background-color: #98CE97 !important;
 }
+
 .bc-B2 {
-    background-color: #F3FFF3 !important;
+  background-color: #E5F2E5 !important;
 }
+
 .bc-B3 {
-    background-color: #EAFFDF !important;
+  background-color: #EAFFDF !important;
 }
+
 .bc-B4 {
-    background-color: #C1E1C0 !important;
+  background-color: #C1E1C0 !important;
 }
 
 .bc-C1 {
-    background-color: #8E5E4A !important;
+  background-color: #8E5E4A !important;
 }
+
 .bc-C2 {
-    background-color: #FFF4E9 !important;
+  background-color: #FFF4E9 !important;
 }
+
 .bc-C3 {
-    background-color: #E9AB91 !important;
+  background-color: #E9AB91 !important;
 }
+
 .bc-C4 {
-    background-color: #D0B1A5 !important;
+  background-color: #D0B1A5 !important;
+}
+
+.bc-D1 {
+  background-color: #4E454A !important;
+}
+
+.bc-D2 {
+  background-color: #dddcdc !important;
+}
+
+.bc-D3 {
+  background-color: #E5EBEC !important;
+}
+
+.bc-D4 {
+  background-color: #4d4449 !important;
 }
 
 /* フォント色 */
 .fc-A1 {
-    color: #F28280 !important;
+  color: #F28280 !important;
 }
+
 .fc-A2 {
-    color: #FFF5F6 !important;
+  color: #FFF5F6 !important;
 }
+
 .fc-A3 {
-    color: #FFDFF3 !important;
+  color: #FFDFF3 !important;
 }
 
 .fc-B1 {
-    color: #98CE97 !important;
+  color: #98CE97 !important;
 }
+
 .fc-B2 {
-    color: #F3FFF3 !important;
+  color: #E5F2E5 !important;
 }
+
 .fc-B3 {
-    color: #EAFFDF !important;
+  color: #EAFFDF !important;
 }
 
 .fc-C1 {
-    color: #8E5E4A !important;
-}
-.fc-C2 {
-    color: #FFF4E9 !important;
-}
-.fc-C3 {
-    color: #E9AB91 !important;
+  color: #8E5E4A !important;
 }
 
+.fc-C2 {
+  color: #FFF4E9 !important;
+}
+
+.fc-C3 {
+  color: #E9AB91 !important;
+}
+
+.fc-D1 {
+  color: #4E454A !important;
+}
+
+.fc-D2 {
+  color: #dddcdc !important;
+}
+
+.fc-D3 {
+  color: #E5EBEC !important;
+}
 
 .bi-A1 {
-    background-image : linear-gradient(to right, #F28280 4px, transparent 4px);
+  background-image: linear-gradient(to right, #F28280 4px, transparent 4px);
 }
+
 .bi-B1 {
-    background-image : linear-gradient(to right, #98CE97 4px, transparent 4px);
+  background-image: linear-gradient(to right, #98CE97 4px, transparent 4px);
 }
+
 .bi-C1 {
-    background-image : linear-gradient(to right, #8E5E4A 4px, transparent 4px);
+  background-image: linear-gradient(to right, #8E5E4A 4px, transparent 4px);
+}
+
+.bi-D1 {
+  background-image: linear-gradient(to right, #4E454A 4px, transparent 4px);
 }
 
 .boc-A1 {
-    border-color : #F28280;
+  border-color: #F28280;
 }
+
 .boc-B1 {
-    border-color : #98CE97;
+  border-color: #98CE97;
 }
+
 .boc-C1 {
-    border-color : #8E5E4A;
+  border-color: #8E5E4A;
+}
+
+.boc-D1 {
+  border-color: #4E454A;
 }
 
 .focus-A1:focus {
-    outline: 2px solid #f28280; 
+  outline: 2px solid #F28280;
 }
+
 .focus-B1:focus {
-    outline: 2px solid #98CE97; 
+  outline: 2px solid #98CE97;
 }
+
 .focus-C1:focus {
-    outline: 2px solid #8E5E4A; 
+  outline: 2px solid #8E5E4A;
+}
+
+.focus-D1:focus {
+  outline: 2px solid #4E454A;
 }
 
 .input-A2:-webkit-autofill {
-    box-shadow: 0 0 0 1000px #fff5f6 inset;
+  box-shadow: 0 0 0 1000px #FFF5F6 inset;
 }
+
 .input-B2:-webkit-autofill {
-    box-shadow: 0 0 0 1000px #F3FFF3 inset;
+  box-shadow: 0 0 0 1000px #E5F2E5 inset;
 }
+
 .input-C2:-webkit-autofill {
-    box-shadow: 0 0 0 1000px #FFF4E9 inset;
+  box-shadow: 0 0 0 1000px #FFF4E9 inset;
 }
 
-
-
-
-
+.input-D2:-webkit-autofill {
+  box-shadow: 0 0 0 1000px #dddcdc inset;
+}

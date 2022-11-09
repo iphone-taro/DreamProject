@@ -1,0 +1,173 @@
+@import "https://use.fontawesome.com/releases/v5.13.0/css/all.css";
+
+$A1 : #F28280;
+$A2 : #FFF5F6;
+$A3 : #FFDFF3;
+$A4 : #FFD3D7;
+
+$B1 : #98CE97;
+$B2 : #E5F2E5;
+$B3 : #EAFFDF;
+$B4 : #C1E1C0;
+
+$C1 : #8E5E4A;
+$C2 : #FFF4E9;
+$C3 : #E9AB91;
+$C4 : #D0B1A5;
+
+$D1 : #4E454A;
+$D2 : #dddcdc;
+$D3 : #E5EBEC;
+$D4 : #4d4449;
+
+/* 背景色 */
+.bc-A1 {
+    background-color: $A1 !important;
+}
+.bc-A2 {
+    background-color: $A2 !important;
+}
+.bc-A3 {
+    background-color: $A3 !important;
+}
+.bc-A4 {
+    background-color: $A4 !important;
+}
+
+.bc-B1 {
+    background-color: $B1 !important;
+}
+.bc-B2 {
+    background-color: $B2 !important;
+}
+.bc-B3 {
+    background-color: $B3 !important;
+}
+.bc-B4 {
+    background-color: $B4 !important;
+}
+
+.bc-C1 {
+    background-color: $C1 !important;
+}
+.bc-C2 {
+    background-color: $C2 !important;
+}
+.bc-C3 {
+    background-color: $C3 !important;
+}
+.bc-C4 {
+    background-color: $C4 !important;
+}
+
+.bc-D1 {
+    background-color: $D1 !important;
+}
+.bc-D2 {
+    background-color: $D2 !important;
+}
+.bc-D3 {
+    background-color: $D3 !important;
+}
+.bc-D4 {
+    background-color: $D4 !important;
+}
+
+/* フォント色 */
+.fc-A1 {
+    color: $A1 !important;
+}
+.fc-A2 {
+    color: $A2 !important;
+}
+.fc-A3 {
+    color: $A3 !important;
+}
+
+.fc-B1 {
+    color: $B1 !important;
+}
+.fc-B2 {
+    color: $B2 !important;
+}
+.fc-B3 {
+    color: $B3 !important;
+}
+
+.fc-C1 {
+    color: $C1 !important;
+}
+.fc-C2 {
+    color: $C2 !important;
+}
+.fc-C3 {
+    color: $C3 !important;
+}
+
+.fc-D1 {
+    color: $D1 !important;
+}
+.fc-D2 {
+    color: $D2 !important;
+}
+.fc-D3 {
+    color: $D3 !important;
+}
+
+
+.bi-A1 {
+    background-image : linear-gradient(to right, $A1 4px, transparent 4px);
+}
+.bi-B1 {
+    background-image : linear-gradient(to right, $B1 4px, transparent 4px);
+}
+.bi-C1 {
+    background-image : linear-gradient(to right, $C1 4px, transparent 4px);
+}
+.bi-D1 {
+    background-image : linear-gradient(to right, $D1 4px, transparent 4px);
+}
+
+.boc-A1 {
+    border-color : $A1;
+}
+.boc-B1 {
+    border-color : $B1;
+}
+.boc-C1 {
+    border-color : $C1;
+}
+.boc-D1 {
+    border-color : $D1;
+}
+
+.focus-A1:focus {
+    outline: 2px solid $A1; 
+}
+.focus-B1:focus {
+    outline: 2px solid $B1; 
+}
+.focus-C1:focus {
+    outline: 2px solid $C1; 
+}
+.focus-D1:focus {
+    outline: 2px solid $D1; 
+}
+
+.input-A2:-webkit-autofill {
+    box-shadow: 0 0 0 1000px $A2 inset;
+}
+.input-B2:-webkit-autofill {
+    box-shadow: 0 0 0 1000px $B2 inset;
+}
+.input-C2:-webkit-autofill {
+    box-shadow: 0 0 0 1000px $C2 inset;
+}
+.input-D2:-webkit-autofill { 
+    box-shadow: 0 0 0 1000px $D2 inset;
+}
+
+
+
+
+

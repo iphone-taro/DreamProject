@@ -119,6 +119,7 @@ body {
 
 .dotBar {
     height: 4px;
+    margin: 10px 0px;
     background-size: 8px 4px;
     background-repeat: repeat-x; 
     background-position: left bottom;
