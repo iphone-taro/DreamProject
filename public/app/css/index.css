@@ -134,6 +134,73 @@ body {
     padding: 7px 0 0 10px;
 }
 
+.common-grayBar {
+    background-color:#303432;
+    height:2px;
+    opacity:0.1;
+    margin:8px 0 13px 0;
+}
+.common-head {
+    font-size: 16px;
+    /* padding-left: 10px; */
+    margin-bottom:5px;
+    margin-top:20px;
+}
+
+.common-sentence {
+    text-indent: 1em;
+    font-size: 12px;
+    /* margin-left: 20px; */
+    width:95%;
+    margin:auto;
+    line-height: 1.7em;
+    word-break: break-all;
+}
+
+.common-ol1 {
+    text-indent: 0em;
+    list-style-type: decimal;
+    /* padding-left:16px; */
+}
+
+.common-ol1 > li {
+    margin-top:10px;
+}
+
+/* .common-ol2 {
+    list-style-type: lower-roman;
+    padding-left:16px;
+} */
+
+.common-ol2 {
+    text-indent: 0em;
+    /* サイトに合せて調整*/
+	/* margin-left: 20px;   */
+}
+ 
+.common-ol2 > li {
+	list-style-type: none;
+	counter-increment: cnt;
+    margin-top:10px;
+}
+ 
+.common-ol2 > li::before {
+	content: "(" counter(cnt) ")";
+	display:inline-block;
+	margin-left:-2.4em; /*サイトに合せて調整 */
+    width: 2.2em; /*サイトに合せて調整 */
+}
+
+.common-ul1 {
+    text-indent: 0em;
+    list-style-type: disc !important; 
+    padding-left:16px !important;
+}
+
+.common-ul1 {
+    margin-top:6px;
+}
+
 #overlay{
     /*要素を重ねた時の順番*/
     z-index:9999;
@@ -397,6 +464,9 @@ input:-webkit-autofill {
 .btn-icon-plus_3:before {
     background: url("../img/btnicon/btnicon_plus_3.png") no-repeat;
 }
+.btn-icon-plus_4:before {
+    background: url("../img/btnicon/btnicon_plus_4.png") no-repeat;
+}
 
 .btn-icon-follow-on:before {
     width: 18px;
@@ -411,6 +481,9 @@ input:-webkit-autofill {
 }
 .btn-icon-follow-on_3:before {
     background: url("../img/btnicon/btnicon_follow_on_3.png") no-repeat;
+}
+.btn-icon-follow-on_4:before {
+    background: url("../img/btnicon/btnicon_follow_on_4.png") no-repeat;
 }
 
 .btn-icon-follow-off:before {
@@ -434,6 +507,9 @@ input:-webkit-autofill {
 .btn-icon-mute-on_3:before {
     background: url("../img/btnicon/btnicon_mute_on_3.png") no-repeat;
 }
+.btn-icon-mute-on_4:before {
+    background: url("../img/btnicon/btnicon_mute_on_4.png") no-repeat;
+}
 
 .btn-icon-mute-off:before {
     background: url("../img/btnicon/btnicon_mute_off.png") no-repeat;
@@ -456,6 +532,9 @@ input:-webkit-autofill {
 }
 .btn-icon-bookmark-on_3:before {
     background: url("../img/btnicon/btnicon_bookmark_on_3.png") no-repeat;
+}
+.btn-icon-bookmark-on_4:before {
+    background: url("../img/btnicon/btnicon_bookmark_on_4.png") no-repeat;
 }
 
 .btn-icon-bookmark-off:before {

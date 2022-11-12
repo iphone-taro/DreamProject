@@ -28,7 +28,8 @@ return new class extends Migration
             $table->string('favorite_tag')->default('');
             $table->string('mute_tag')->default('');
             $table->rememberToken();
-            $table->timestamp('email_verified_at')->nullable();
+            // $table->timestamp('email_verified_at')->nullable();
+            $table->timestamp('last_login')->useCurrent();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();
         });

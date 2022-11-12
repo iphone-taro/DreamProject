@@ -59,6 +59,15 @@
 	background: #8E5E4A !important;
 }
 
+.theme_chk_D1 label input:checked ~ .indicator{
+	background:#4E454A !important;
+}
+.theme_chk_D1 label:hover input:not([disabled]):checked ~ .indicator{
+	background:#4E454A !important;
+}
+.theme_chk_D1 .typeA-radio input:checked ~ .indicator{
+	background: #4E454A !important;
+}
 
 #CHK .typeA-radio:hover input:not([disabled]):checked ~ .indicator{
 	background:rgba(232,122,144,.7);
@@ -151,6 +160,10 @@
   .theme_switch_3 input[type="checkbox"]:checked +label {
 	/* border-color   : #f28280;             選択タブの枠線     */
 	background-color: #8E5E4A;
+  }
+  .theme_switch_4 input[type="checkbox"]:checked +label {
+	/* border-color   : #f28280;             選択タブの枠線     */
+	background-color: #4E454A;
   }
   
    /* === 表示する文字（標準） ================================ */

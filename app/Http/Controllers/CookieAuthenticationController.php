@@ -537,6 +537,10 @@ final class CookieAuthenticationController extends Controller
 
         $kbn = $tempData->temp_kbn;
 
+        $mailTitle = '';
+        $mailBody = '';
+        $mailEmail = $tempData->mail_address; 
+
         if ($kbn == 'NEW') {
             //新規登録用
             //ユーザーテーブルへ挿入
@@ -578,6 +582,13 @@ final class CookieAuthenticationController extends Controller
                     //tempテーブルからデータを削除
                     $deleteTemp = $tempData->delete();
 
+                    //メール送信
+                    $mailTitle = "本登録完了";
+                    $mailBody = "本登録完了しましたよー";
+                    $mailBody = $mailBody . $tempData->temp_id;
+                    Mail::send(new MailMgr($mailTitle, $mailBody, $mailEmail));
+
+
                     DB::commit();                 
                     return response()->json(['status' => Consts::API_SUCCESS, 'kbn' => $kbn]);
                 } else {
@@ -598,6 +609,18 @@ final class CookieAuthenticationController extends Controller
                 $userData->password = $tempData->password;
             }
             $flg = $userData->save();
+
+            //メール送信
+            if ($kbn == "CHANGE") {
+                $mailTitle = "メールアドレス変更完了";
+                $mailBody = "メールアドレス変更しましたよー";    
+            } else {
+                $mailTitle = "メールアカウント追加完了";
+                $mailBody = "メールアカウント追加完了しましたよー";    
+            }
+            $mailBody = $mailBody . $tempData->temp_id;
+            Mail::send(new MailMgr($mailTitle, $mailBody, $mailEmail));
+
 
             //tempテーブルからデータを削除
             $deleteTemp = $tempData->delete();
@@ -652,6 +675,14 @@ final class CookieAuthenticationController extends Controller
         $flg = $userData->save();
 
         if ($flg) {
+
+            //メール送信
+            $mailTitle = "パスワード更新完了";
+            $mailBody = "パスワード更新完了しましたよー";
+            $mailAddress = $userData->mail_address;
+            $mailBody = $mailBody . $tempData->temp_id;
+            Mail::send(new MailMgr($mailTitle, $mailBody, $mailEmail));
+
             return response()->json(['status' => Consts::API_SUCCESS, 'baseInfo' => $this->retUserInfo()]);
         } else {
             return response()->json(['status' => Consts::API_FAILED_EXEPTION, 'errMsg' => 'パスワード更新エラー']);
@@ -768,6 +799,10 @@ final class CookieAuthenticationController extends Controller
 
         if (Auth::attempt(['mail_address' => $request->mailAddress, 'password' => $request->password])) {
             $user = Auth::User();
+
+            $user->last_login = date("Y/m/d H:i:s");
+            $user->save();
+            
             return response()->json(['status' => Consts::API_SUCCESS]);
         }
 
@@ -803,7 +838,7 @@ final class CookieAuthenticationController extends Controller
             $userData->twitter_code = $request->twitterCode;
             $userData->twitter_token = $request->twitterToken;
             $userData->twitter_token_secret = $request->twitterTokenSecret;
-            
+            $userData->last_login = date("Y/m/d H:i:s");
             $flg = $userData->save();
 
             if (!$flg) {
