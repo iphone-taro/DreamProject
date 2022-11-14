@@ -174,8 +174,7 @@ final class CookieAuthenticationController extends Controller
         //一時テーブルに挿入
         $tempData = Temp::where('mail_address', $request->mailAddress)->where('temp_kbn', 'RESET_PASS')->whereNull('password')->first();
 
-        $mailTitle = 'パスワードリセット';
-        $mailBody = 'パスワードリセット用のURLです<BR>http://localhost:8001/#/resetPassword/';
+        $mailTitle = Consts::MAIL_TITLE_PASS_REQ;
         $mailEmail = $request->mailAddress;    
 
         if ($tempData == null) {
@@ -211,7 +210,7 @@ final class CookieAuthenticationController extends Controller
                 if ($flg) {
 
                     //メールを送信
-                    $mailBody = $mailBody . $tempData->temp_id;
+                    $mailBody = str_replace("###", $tempData->temp_id, Consts::MAIL_BODY_PASS_REQ);
                     Mail::send(new MailMgr($mailTitle, $mailBody, $mailEmail));
 
                     DB::commit();
@@ -234,7 +233,8 @@ final class CookieAuthenticationController extends Controller
 
                 if ($flg) {
                     //メールを送信
-                    $mailBody = $mailBody . $tempData->temp_id;
+                    $mailBody = str_replace("###", $tempData->temp_id, Consts::MAIL_BODY_PASS_REQ);
+                              
                     Mail::send(new MailMgr($mailTitle, $mailBody, $mailEmail));
 
                     DB::commit();
@@ -326,6 +326,12 @@ final class CookieAuthenticationController extends Controller
             //tempテーブルからデータを削除
             $deleteTemp = $tempData->delete();
             
+            //メール送信
+            $mailTitle = Consts::MAIL_TITLE_PASS_COMP;
+            $mailBody = str_replace("###", $tempData->temp_id, Consts::MAIL_BODY_PASS_COMP);
+            $mailAddress = $userData->mail_address;
+            Mail::send(new MailMgr($mailTitle, $mailBody, $mailEmail));
+
             return response()->json(['status' => Consts::API_SUCCESS]);
         } else {
             return response()->json(['status' => Consts::API_EXCEPTION, 'errMsg' => 'リセットエラー']);
@@ -381,9 +387,20 @@ final class CookieAuthenticationController extends Controller
         //一時テーブルに挿入
         $tempData = Temp::where('mail_address', $request->mailAddress)->where('temp_kbn', $kbn)->first();            
        
-        $mailTitle = '新規登録用メール';
-        $mailBody = '新規登録用のURLです<BR>http://localhost:8001/#/registrationConfirmation/';
+        //メール設定
+        $mailTitle = "";
+        $mailBody = "";
         $mailEmail = $request->mailAddress; 
+        if ($kbn == "NEW") {
+            $mailTitle = Consts::MAIL_TITLE_MAIL_NEW_REQ;
+            $mailBody = Consts::MAIL_BODY_MAIL_NEW_REQ;
+        } else if ($kbn == "CHANGE") {
+            $mailTitle = Consts::MAIL_TITLE_MAIL_CHANGE_REQ;
+            $mailBody = Consts::MAIL_BODY_MAIL_CHANGE_REQ;
+        } else if ($kbn == "ADD") {
+            $mailTitle = Consts::MAIL_TITLE_MAIL_ADD_REQ;
+            $mailBody = Consts::MAIL_BODY_MAIL_ADD_REQ;
+        }
 
         //メール送信処理
         if ($tempData == null) {
@@ -439,7 +456,7 @@ final class CookieAuthenticationController extends Controller
                 $tempData->save();
 
                 //メールを送信
-                $mailBody = $mailBody . $tempData->temp_id;
+                $mailBody = str_replace("###", $tempData->temp_id, $mailBody);
                 Mail::send(new MailMgr($mailTitle, $mailBody, $mailEmail));
 
                 DB::commit();
@@ -482,7 +499,7 @@ final class CookieAuthenticationController extends Controller
                 $tempData->save();
                 
                 //メールを送信
-                $mailBody = $mailBody . $tempData->temp_id;
+                $mailBody = str_replace("###", $tempData->temp_id, $mailBody);
                 Mail::send(new MailMgr($mailTitle, $mailBody, $mailEmail));
 
                 DB::commit();
@@ -583,9 +600,9 @@ final class CookieAuthenticationController extends Controller
                     $deleteTemp = $tempData->delete();
 
                     //メール送信
-                    $mailTitle = "本登録完了";
-                    $mailBody = "本登録完了しましたよー";
-                    $mailBody = $mailBody . $tempData->temp_id;
+                    $mailTitle = Consts::MAIL_TITLE_MAIL_NEW_COMP;
+                    $mailBody = Consts::MAIL_BODY_MAIL_NEW_COMP;
+                    $mailBody = str_replace("###", $tempData->temp_id, $mailBody);
                     Mail::send(new MailMgr($mailTitle, $mailBody, $mailEmail));
 
 
@@ -612,15 +629,14 @@ final class CookieAuthenticationController extends Controller
 
             //メール送信
             if ($kbn == "CHANGE") {
-                $mailTitle = "メールアドレス変更完了";
-                $mailBody = "メールアドレス変更しましたよー";    
+                $mailTitle = Consts::MAIL_TITLE_MAIL_CHANGE_COMP;
+                $mailBody = Consts::MAIL_BODY_MAIL_CHANGE_COMP; 
             } else {
-                $mailTitle = "メールアカウント追加完了";
-                $mailBody = "メールアカウント追加完了しましたよー";    
+                $mailTitle = Consts::MAIL_TITLE_MAIL_ADD_COMP;
+                $mailBody = Consts::MAIL_BODY_MAIL_ADD_COMP;    
             }
-            $mailBody = $mailBody . $tempData->temp_id;
+            $mailBody = str_replace("###", $tempData->temp_id, $mailBody);
             Mail::send(new MailMgr($mailTitle, $mailBody, $mailEmail));
-
 
             //tempテーブルからデータを削除
             $deleteTemp = $tempData->delete();
@@ -677,10 +693,11 @@ final class CookieAuthenticationController extends Controller
         if ($flg) {
 
             //メール送信
-            $mailTitle = "パスワード更新完了";
-            $mailBody = "パスワード更新完了しましたよー";
+            $mailTitle = Consts::MAIL_TITLE_PASS_COMP;
+            $mailBody = Consts::MAIL_BODY_PASS_COMP;
+            $mailBody = str_replace("###", $tempData->temp_id, $mailBody);
             $mailAddress = $userData->mail_address;
-            $mailBody = $mailBody . $tempData->temp_id;
+
             Mail::send(new MailMgr($mailTitle, $mailBody, $mailEmail));
 
             return response()->json(['status' => Consts::API_SUCCESS, 'baseInfo' => $this->retUserInfo()]);

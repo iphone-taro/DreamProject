@@ -32,7 +32,7 @@ class MailMgr extends Mailable
     {
         return $this->to($this->email)
         ->subject($this->title)
-        ->view('mail')
+        ->text('mail')
         ->with([
             'body' => $this->body,
         ]);
