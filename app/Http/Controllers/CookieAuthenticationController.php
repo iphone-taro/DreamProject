@@ -934,7 +934,6 @@ final class CookieAuthenticationController extends Controller
             $newUser->twitter_token_secret = $twitterTokenSecret;
             $newUser->mail_address = '';
             $newUser->password = '';
-            $newUser->email_verified_at = date("Y/m/d H:i:s");
 
             try {
                 DB::beginTransaction();
