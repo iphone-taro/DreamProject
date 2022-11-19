@@ -18,7 +18,7 @@ class CreatePostsTable extends Migration
             $table->string('user_id');
             $table->string('title');
             $table->string('outline');
-            $table->string('body')->default('');
+            $table->text('body')->default('');
             $table->string('conversion');
             $table->string('series');
             $table->integer('rating');
