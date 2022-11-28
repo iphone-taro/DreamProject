@@ -108,7 +108,7 @@
     display: inline-block;
     cursor:pointer;
 	background-image: url("../img/tab_base.png");
-	background-size: 110px 176px;
+	background-size: 110px 198px;
 	background-repeat: no-repeat;
 }
 
@@ -147,6 +147,11 @@
 .tab_setting_2 {background-position: -44px -132px}
 .tab_setting_3 {background-position: -66px -132px}
 .tab_setting_4 {background-position: -88px -132px}
+.tab_latest_0 {background-position: 0px -176px}
+.tab_latest_1 {background-position: -22px -176px}
+.tab_latest_2 {background-position: -44px -176px}
+.tab_latest_3 {background-position: -66px -176px}
+.tab_latest_4 {background-position: -88px -176px}
 
 .menu_icon_base {
 	/* display: inline-block; */
@@ -156,7 +161,7 @@
     display: inline-block;
     cursor:pointer;
 	background-image: url("../img/tab_base.png");
-	background-size: 100px 160px;
+	background-size: 100px 180px;
 	background-repeat: no-repeat;
 }
 

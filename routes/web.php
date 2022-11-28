@@ -59,6 +59,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/api/getPostList', [DreamController::class, 'getPostList']);
 
+    Route::post('/api/getLatestPostList', [DreamController::class, 'getLatestPostList']);
+
     Route::post('/api/getMyPostList', [DreamController::class, 'getMyPostList']);
 
     Route::post('/api/getBookmarkList', [DreamController::class, 'getBookmarkList']);
@@ -76,6 +78,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/api/updateSettingFavorite', [DreamController::class, 'updateSettingFavorite']);
     Route::post('/api/updateSettingMute', [DreamController::class, 'updateSettingMute']);
     Route::post('/api/updateSettingShowTwitter', [DreamController::class, 'updateSettingShowTwitter']);
+    Route::post('/api/updateSettingRestrictions', [DreamController::class, 'updateSettingRestrictions']);
     Route::post('/api/deleteUser', [DreamController::class, 'deleteUser']);
 
     Route::post('/api/reqAuthMail', [CookieAuthenticationController::class, 'requestRegister']);

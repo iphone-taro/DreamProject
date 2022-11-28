@@ -27,6 +27,8 @@ return new class extends Migration
             $table->string('profile')->default('');
             $table->string('favorite_tag')->default('');
             $table->string('mute_tag')->default('');
+            $table->integer('disp_r18')->default(0);
+            $table->integer('disp_r18g')->default(0);
             $table->rememberToken();
             // $table->timestamp('email_verified_at')->nullable();
             $table->timestamp('last_login')->useCurrent();

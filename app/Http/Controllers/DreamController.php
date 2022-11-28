@@ -61,6 +61,8 @@ class DreamController extends Controller
             'mute_tag' => $userData['mute_tag'],
             'mail_address' => $userData['mail_address'],
             'show_twitter' => $userData['show_twitter'],
+            'disp_r18' => $userData['disp_r18'],
+            'disp_r18g' => $userData['disp_r18g'],
         );
 
         if ($userData['mail_address'] == '') {
@@ -128,6 +130,39 @@ class DreamController extends Controller
     }
 
     //
+    //新着一覧取得
+    //
+    public function getLatestPostList(Request $request): JsonResponse {
+        $userData = Auth::User();
+
+        $dispR18 = "0";
+        $dispR18g = "0";
+        if ($userData->disp_r18 == 1) {
+            $dispR18 = "1";
+        }
+        if ($userData->disp_r18 == 1) {
+            $dispR18g = "1";
+        }
+        $filterStr = "0441" . $dispR18 . $dispR18g . "1111111";
+        $wordStr = "";
+
+        $sql = $this->makePostListSql($filterStr, $wordStr, false);
+        //件数
+        $sql = $sql . "LIMIT 50";
+
+        //対象データ取得
+        $postList = \DB::select($sql);
+
+        $retArray = array();
+        $retArray = $retArray + array('sql' => $sql);
+        $retArray = $retArray + array('postList' => $postList);
+        $retArray = $retArray + array('status' => Consts::API_SUCCESS);
+        $retArray = $retArray + array('baseInfo' => $this->retUserInfo());
+        
+        return response()->json($retArray);
+    }
+
+    //
     //検索一覧取得
     //
     public function getPostList(Request $request): JsonResponse {
@@ -140,10 +175,7 @@ class DreamController extends Controller
             return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
         }
 
-        //ユーザーIDを取得
-		$userId = Auth::User()->user_id;
-		$filterStr = $request->filter;
-		$muteStr = Auth::User()->mute_tag;
+        $filterStr = $request->filter;
         $wordStr = "";
         if ($request->keyword != null) {
             $wordStr = trim(str_replace("　", " ", $request->keyword));
@@ -164,6 +196,7 @@ class DreamController extends Controller
 		$fConversion0 = substr($filterStr, 11, 1);
 		$fConversion1 = substr($filterStr, 12, 1);
 
+        //入力チェック
         if (($fOrder != 0 && $fOrder != 1 && $fOrder != 2) ||
 		($fDuration != 0 && $fDuration != 1 && $fDuration != 2 && $fDuration != 3) ||
 		($fLen != 0 && $fLen != 1 && $fLen != 2 && $fLen != 3) ||
@@ -188,6 +221,49 @@ class DreamController extends Controller
             $page = 1;
         }
         $start = ($page - 1) * 10;
+        
+        //件数取得用SQL
+        $countSql = $this->makePostListSql($filterStr, $wordStr, true);
+        $postCount = \DB::select($countSql);
+
+        $sql = $this->makePostListSql($filterStr, $wordStr, false);
+        //件数
+        $sql = $sql . "LIMIT " . $start . ", 10";
+
+        //対象データ取得
+        $postList = \DB::select($sql);
+        $retArray = array();
+        $retArray = $retArray + array('sql' => $sql);
+        $retArray = $retArray + array('count' => $postCount[0]->abc);
+        $retArray = $retArray + array('postList' => $postList);
+        $retArray = $retArray + array('status' => Consts::API_SUCCESS);
+        $retArray = $retArray + array('baseInfo' => $this->retUserInfo());
+        $retArray = $retArray + array('test' => $request->test);
+        
+        return response()->json($retArray);
+    }
+
+    //
+    //投稿一覧取得SQL生成
+    //
+    public function makePostListSql($filterStr, $wordStr,  $isCount) {
+        //ユーザーIDを取得
+		$userId = Auth::User()->user_id;
+		$muteStr = Auth::User()->mute_tag;
+
+        $fOrder = substr($filterStr, 0, 1);
+		$fDuration = substr($filterStr, 1, 1);
+		$fLen = substr($filterStr, 2, 1);
+		$fRating0 = substr($filterStr, 3, 1);
+		$fRating1 = substr($filterStr, 4, 1);
+		$fRating2 = substr($filterStr, 5, 1);
+		$fChara0 = substr($filterStr, 6, 1);
+		$fChara1 = substr($filterStr, 7, 1);
+		$fChara2 = substr($filterStr, 8, 1);
+		$fCreation0 = substr($filterStr, 9, 1);
+		$fCreation1 = substr($filterStr, 10, 1);
+		$fConversion0 = substr($filterStr, 11, 1);
+		$fConversion1 = substr($filterStr, 12, 1);
         
         $retArray = array();
 
@@ -381,34 +457,20 @@ class DreamController extends Controller
         $sql = $sql . " 1 = 1 ";
 
         //件数を先に取得
-        $countSql = "SELECT count(*) as abc " . $sql;
-        // dd($countSql);
-        $postCount = \DB::select($countSql);
-
-        //並べ替え
-        if ($fOrder == 0) {
-            $sql = $sql . "ORDER BY `posts`.`created_at` DESC ";
-        } else if ($fOrder == 1) {
-            $sql = $sql . "ORDER BY `posts`.`created_at` asc ";
-        } else if ($fOrder == 2) {
-            $sql = $sql . "ORDER BY `book` DESC, `posts`.`created_at` DESC ";
+        if ($isCount) {
+            return "SELECT count(*) as abc " . $sql;
+        } else {
+            //並べ替え
+            if ($fOrder == 0) {
+                $sql = $sql . "ORDER BY `posts`.`created_at` DESC ";
+            } else if ($fOrder == 1) {
+                $sql = $sql . "ORDER BY `posts`.`created_at` asc ";
+            } else if ($fOrder == 2) {
+                $sql = $sql . "ORDER BY `book` DESC, `posts`.`created_at` DESC ";
+            }            
+            return $sqlInit . $sql;
         }
-        
-        //件数
-        $sql = $sql . "LIMIT " . $start . ", 10";
-
-        //対象データ取得
-        $dataSql = $sqlInit . $sql;
-        $postList = \DB::select($dataSql);
-
-        $retArray = $retArray + array('sql' => $dataSql);
-        $retArray = $retArray + array('count' => $postCount[0]->abc);
-        $retArray = $retArray + array('postList' => $postList);
-        $retArray = $retArray + array('status' => Consts::API_SUCCESS);
-        $retArray = $retArray + array('baseInfo' => $this->retUserInfo());
-        $retArray = $retArray + array('test' => $request->test);
-        
-        return response()->json($retArray);
+        // dd($countSql);
     }
 
     //
@@ -418,6 +480,7 @@ class DreamController extends Controller
         $postList = \DB::select('
             SELECT
              posts.post_id,
+             posts.user_id,
              posts.title,
              posts.outline,
              char_length(posts.body) AS length,
@@ -1132,11 +1195,6 @@ class DreamController extends Controller
     //
     public function updateSettingShowTwitter(Request $request): JsonResponse {
         $showTwitter = $request->showTwitter;
-        if ($showTwitter == "true") {
-            $showTwitter = 1;
-        } else {
-            $showTwitter = 0;
-        }
         
         //ユーザー情報を取得
         $userData = Auth::User();
@@ -1144,9 +1202,31 @@ class DreamController extends Controller
         //情報を更新
         $userData->show_twitter = $showTwitter;
         // $userData->updated_at = date("Y/m/d H:i:s");
-        $userData->update();
+        $userData->save();
 
         return response()->json(['status' => Consts::API_SUCCESS, 'baseInfo' => $this->retUserInfo()]);
+    }
+
+    //
+    //設定 － 閲覧制限更新
+    //
+    public function updateSettingRestrictions(Request $request): JsonResponse {
+        $kbn = $request->kbn;
+        $param = $request->param;
+
+        //ユーザー情報を取得
+        $userData = Auth::User();
+
+        //情報を更新
+        if ($kbn == "R18") {
+            $userData->disp_r18 = $param;
+        } else {
+            $userData->disp_r18g = $param;
+        }
+        // $userData->updated_at = date("Y/m/d H:i:s");
+        $userData->save();
+
+        return response()->json(['status' => Consts::API_SUCCESS, 'baseInfo' => $this->retUserInfo(), 'param' => $param]);
     }
 
     //
@@ -1491,7 +1571,7 @@ class DreamController extends Controller
                 //メンバー
                 return "1";
             }
-        }  else if ($kbn == "FRIENDSHIP") {
+        } else if ($kbn == "FRIENDSHIP") {
             $apiData = $twObj->get("friendships/lookup", ["user_id" => $param]);
             if (property_exists($apiData, 'errors')) {
                 return null;

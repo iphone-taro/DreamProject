@@ -330,7 +330,7 @@ final class CookieAuthenticationController extends Controller
             $mailTitle = Consts::MAIL_TITLE_PASS_COMP;
             $mailBody = str_replace("###", $tempData->temp_id, Consts::MAIL_BODY_PASS_COMP);
             $mailAddress = $userData->mail_address;
-            Mail::send(new MailMgr($mailTitle, $mailBody, $mailEmail));
+            Mail::send(new MailMgr($mailTitle, $mailBody, $mailAddress));
 
             return response()->json(['status' => Consts::API_SUCCESS]);
         } else {
