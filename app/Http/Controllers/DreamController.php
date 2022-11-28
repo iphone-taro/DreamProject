@@ -140,7 +140,7 @@ class DreamController extends Controller
         if ($userData->disp_r18 == 1) {
             $dispR18 = "1";
         }
-        if ($userData->disp_r18 == 1) {
+        if ($userData->disp_r18g == 1) {
             $dispR18g = "1";
         }
         $filterStr = "0441" . $dispR18 . $dispR18g . "1111111";
