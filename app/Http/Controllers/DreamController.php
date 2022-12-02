@@ -143,7 +143,7 @@ class DreamController extends Controller
         if ($userData->disp_r18g == 1) {
             $dispR18g = "1";
         }
-        $filterStr = "0441" . $dispR18 . $dispR18g . "1111111";
+        $filterStr = "04411" . $dispR18 . $dispR18g . "1111111";
         $wordStr = "";
 
         $sql = $this->makePostListSql($filterStr, $wordStr, false);
@@ -169,7 +169,7 @@ class DreamController extends Controller
         //入力チェック
         try {
             $validatedData = $request->validate([
-                'filter' => 'required|string|size:13',
+                'filter' => 'required|string|size:14',
             ]);
         } catch (ValidationException $e) {
             return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
@@ -188,13 +188,14 @@ class DreamController extends Controller
 		$fRating0 = substr($filterStr, 3, 1);
 		$fRating1 = substr($filterStr, 4, 1);
 		$fRating2 = substr($filterStr, 5, 1);
-		$fChara0 = substr($filterStr, 6, 1);
-		$fChara1 = substr($filterStr, 7, 1);
-		$fChara2 = substr($filterStr, 8, 1);
-		$fCreation0 = substr($filterStr, 9, 1);
-		$fCreation1 = substr($filterStr, 10, 1);
-		$fConversion0 = substr($filterStr, 11, 1);
-		$fConversion1 = substr($filterStr, 12, 1);
+		$fRating3 = substr($filterStr, 6, 1);
+		$fChara0 = substr($filterStr, 7, 1);
+		$fChara1 = substr($filterStr, 8, 1);
+		$fChara2 = substr($filterStr, 9, 1);
+		$fCreation0 = substr($filterStr, 10, 1);
+		$fCreation1 = substr($filterStr, 11, 1);
+		$fConversion0 = substr($filterStr, 12, 1);
+		$fConversion1 = substr($filterStr, 13, 1);
 
         //入力チェック
         if (($fOrder != 0 && $fOrder != 1 && $fOrder != 2) ||
@@ -203,6 +204,7 @@ class DreamController extends Controller
 		($fRating0 != 0 && $fRating0 != 1) ||
 		($fRating1 != 0 && $fRating1 != 1) ||
 		($fRating2 != 0 && $fRating2 != 1) ||
+		($fRating3 != 0 && $fRating3 != 1) ||
 		($fChara0 != 0 && $fChara0 != 1) ||
 		($fChara1 != 0 && $fChara1 != 1) ||
 		($fChara2 != 0 && $fChara2 != 1) ||
@@ -257,13 +259,14 @@ class DreamController extends Controller
 		$fRating0 = substr($filterStr, 3, 1);
 		$fRating1 = substr($filterStr, 4, 1);
 		$fRating2 = substr($filterStr, 5, 1);
-		$fChara0 = substr($filterStr, 6, 1);
-		$fChara1 = substr($filterStr, 7, 1);
-		$fChara2 = substr($filterStr, 8, 1);
-		$fCreation0 = substr($filterStr, 9, 1);
-		$fCreation1 = substr($filterStr, 10, 1);
-		$fConversion0 = substr($filterStr, 11, 1);
-		$fConversion1 = substr($filterStr, 12, 1);
+		$fRating3 = substr($filterStr, 6, 1);
+		$fChara0 = substr($filterStr, 7, 1);
+		$fChara1 = substr($filterStr, 8, 1);
+		$fChara2 = substr($filterStr, 9, 1);
+		$fCreation0 = substr($filterStr, 10, 1);
+		$fCreation1 = substr($filterStr, 11, 1);
+		$fConversion0 = substr($filterStr, 12, 1);
+		$fConversion1 = substr($filterStr, 13, 1);
         
         $retArray = array();
 
@@ -337,10 +340,17 @@ class DreamController extends Controller
                     $fRatingStr = $fRatingStr . "OR `posts`.`rating` = 2 ";
                 }
             }
+            if ($fRating3 == 1) {
+                if ($fRatingStr == "(") {
+                    $fRatingStr = $fRatingStr . "`posts`.`rating` = 3 ";
+                } else {
+                    $fRatingStr = $fRatingStr . "OR `posts`.`rating` = 3 ";
+                }
+            }
             $fRatingStr = $fRatingStr . ") AND ";
             $sql = $sql . $fRatingStr;
         } else {
-            $sql = $sql . "(`posts`.`rating` = 3) AND ";
+            $sql = $sql . "(`posts`.`rating` = 4) AND ";
         }
 
         //主人公
@@ -607,10 +617,10 @@ class DreamController extends Controller
         }
 
         //異常値チェック
-        if (($rating != 0 && $rating != 1 && $rating != 2) || 
+        if (($rating != 0 && $rating != 1 && $rating != 2 && $rating != 3) || 
         ($chara != 0 && $chara != 1 && $chara != 2) ||
         ($creation != 0 && $creation != 1) ||
-        ($filter != 0 && $filter != 1 && $filter != 2 && $filter != 3 && $filter != 4) ||
+        ($filter != 0 && $filter != 1 && $filter != 2 && $filter != 3 && $filter != 4 && $filter != 5) ||
         ($publishing != 0 && $publishing != 1 && $publishing != 2 && $publishing != 3 && $publishing != 4 && $publishing != 99) ||
         ($searchable != 0 && $searchable != 1)) {
             //異常値エラー
@@ -622,8 +632,8 @@ class DreamController extends Controller
             //パスワード
             try {
                 $validatedData = $request->validate([
-                    'publishingSub1' => 'required|max:200',
-                    'publishingSub2' => 'required|max:200',
+                    'publishingSub1' => 'required|max:20',
+                    'publishingSub2' => 'required|max:50',
                 ]);
             } catch (ValidationException $e) {
                 return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
@@ -768,10 +778,10 @@ class DreamController extends Controller
         }
         
         //異常値チェック
-        if (($rating != 0 && $rating != 1 && $rating != 2) || 
+        if (($rating != 0 && $rating != 1 && $rating != 2 && $rating != 3) || 
         ($chara != 0 && $chara != 1 && $chara != 2) ||
         ($creation != 0 && $creation != 1) ||
-        ($filter != 0 && $filter != 1 && $filter != 2 && $filter != 3 && $filter != 4) ||
+        ($filter != 0 && $filter != 1 && $filter != 2 && $filter != 3 && $filter != 4 && $filter != 5) ||
         ($publishing != 0 && $publishing != 1 && $publishing != 2 && $publishing != 3 && $publishing != 4 && $publishing != 99) ||
         ($searchable != 0 && $searchable != 1)) {
             //異常値エラー
@@ -1108,6 +1118,8 @@ class DreamController extends Controller
                     copy('./app/img/icon/icon_default.png', '../storage/app/public/icon/' . $userData->user_id . '.png');
                 }
 
+                DB::commit();
+                
                 return response()->json(['status' => Consts::API_SUCCESS, 'baseInfo' => $userData]);
 
             } else {
