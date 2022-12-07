@@ -51,7 +51,7 @@ class DreamController extends Controller
                 $description = $postData->outline;
 
                 //カード画像データがあるか
-                if (file_exists('../storage/app/public/card/card_' . $postId . '.jpg')) {
+                if (file_exists('../storage/app/public/card/card_' . $postId . '.jpg')) { 
                     //結果画像ある
                     $card = 'card_' . $postId . '.jpg';
                 }
