@@ -1,6 +1,8 @@
 <?php declare(strict_types=1);
 
 namespace App\Http\Controllers;
+use Imagick;
+use ImagickDraw;
 
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -25,6 +27,40 @@ use Abraham\TwitterOAuth\TwitterOAuth;
 
 class DreamController extends Controller
 {   
+    //
+    // SNSカード
+    //
+    public function snsAction($id) {
+        $title = "yumedrop(SNSACTION)";
+        $description = "説明です（SNSACTION）";
+        // $card = "https://iphone-taro.sakura.ne.jp/yumedrop/storage/card/";
+        $card = "card_base.jpg";
+
+        //パラメータあり
+        $postId = $id;
+
+        //クイズID照合
+        if (mb_strlen($postId) == 20) {
+            //長さOK
+            //DB照合
+            $postData = DB::table('posts as post')->where('publishing', '<>', 99)->where('post.post_id', $postId)->first();
+            
+            if ($postData != null) {
+                //データあり
+                $title = $postData->title;
+                $description = $postData->outline;
+
+                //カード画像データがあるか
+                if (file_exists('../storage/app/public/card/card_' . $postId . '.jpg')) {
+                    //結果画像ある
+                    $card = 'card_' . $postId . '.jpg';
+                }
+            }
+        }
+        $header = ['card' => $card, 'title' => $title, 'description' => $description];
+        return view('spa.app')->with(['card' => $card, 'title' => $title, 'description' => $description]);
+    }
+
     //
     //表現規制チェック
     //
@@ -729,7 +765,10 @@ class DreamController extends Controller
         $postData->searchable = $searchable;
         $postData->save();
 
-        return response()->json(['status' => Consts::API_SUCCESS, 'baseInfo' => $this->retUserInfo()]);
+        //twitterカード更新
+        $this->makeTwitterCard($postData);
+
+        return response()->json(['status' => Consts::API_SUCCESS, 'baseInfo' => $this->retUserInfo(), 'postId' => $postId]);
     }
 
     //
@@ -879,8 +918,64 @@ class DreamController extends Controller
         $postData->searchable = $searchable;
         $postData->save();
 
+        //twitterカード更新
+        $this->makeTwitterCard($postData);
+
         return response()->json(['status' => Consts::API_SUCCESS, 'baseInfo' => $this->retUserInfo()]);
     }
+
+    //
+    //Twitterカード生成
+    //
+    public function makeTwitterCard($postData) {
+        $cardBase = new Imagick(realpath("./") . '/app/img/card_base.jpg');
+
+        $draw = new ImagickDraw();
+
+        $titleStr = $postData->title;
+        $outlineStr = $postData->outline;
+
+        $tLen = 25;
+        $tPosiY = 40;
+        $oLen = 30;
+        
+        if (mb_strlen($titleStr) > $tLen) {
+            $title = mb_substr($titleStr, 0, $tLen) . "\n" . mb_substr($titleStr, $tLen);
+            $tPosiY = 30;
+        } else {
+            $title = $titleStr;
+        }
+
+        $outline = "";
+        $c = 0;
+        while ($outlineStr != "") {
+            if (mb_strlen($outlineStr) > $oLen) {
+                if ($outline == "") {
+                    $outline = mb_substr($outlineStr, 0, $oLen);
+                } else {
+                    $outline = $outline . "\n" . mb_substr($outlineStr, 0, $oLen);
+                }
+                $outlineStr = mb_substr($outlineStr, $oLen);
+            } else {
+                if ($outline == "") {
+                    $outline = $outlineStr;
+                } else {
+                    $outline = $outline . "\n" . $outlineStr;
+                }
+                $outlineStr = "";
+            }
+        }
+
+        $draw->setFont(realpath("./") . "/app/font.otf");
+        $draw->setFontSize(18);
+        $draw->setFillColor("black");
+        $draw->setTextInterlineSpacing(5);
+        $cardBase->annotateImage($draw, 130, $tPosiY, 0, $title);
+        $cardBase->annotateImage($draw, 70, 130, 0, $outline);
+        
+        $cardBase->writeImage(realpath("./") . '/storage/card/card_' . $postData->post_id . '.jpg');
+    }
+
 
     //
     //ユーザーページ － ユーザー情報取得
@@ -1113,7 +1208,17 @@ class DreamController extends Controller
             if ($flg) {
                 //アイコンファイルがある場合は更新
                 if ($file != null) {
-                    $file->storeAs('public/icon', $userData->user_id . ".png");
+                    $filePath = $_FILES["iconFile"]["tmp_name"];
+                    $icon = new Imagick($filePath);
+                    $iW = $icon->getImageWidth();
+                    $iH = $icon->getImageHeight();
+                    $iSize = $iW;
+                    if ($iW > $iH) {
+                        $iSize = $iH;
+                    }
+                    $icon->cropThumbnailImage($iSize, $iSize);            
+                    $icon->sampleImage(200, 200);
+                    $icon->writeImage('./storage/icon/' . $userData->user_id . ".png");
                 } else if ($fileName == "DEFAULT") {
                     copy('./app/img/icon/icon_default.png', '../storage/app/public/icon/' . $userData->user_id . '.png');
                 }
@@ -1744,59 +1849,125 @@ class DreamController extends Controller
         return response()->json($retList);
     }
 
-    // 公開リスト取得
-    // フォロー関係取得
-    //リツイート　statuses/show　のretweeted true/false
     public function test(Request $request): JsonResponse {
-        // dd($request->aaa . "  " . $request->bbb);
-        $api_key = Consts::TWITTER_API_KEY;		// APIキー
-        $api_secret = Consts::TWITTER_API_SECRET;		// APIシークレット
+        $cardBase = new Imagick(realpath("./") . '/app/img/card_base.jpg');
 
-        $userData = Auth::User();
-        $access_token = $userData->twitter_token;		// アクセストークン
-        $access_token_secret = $userData->twitter_token_secret;		// アクセストークンシークレット   
-        // dd($access_token . " " . $access_token_secret);
+        $draw = new ImagickDraw();
 
-        $twObj = new TwitterOAuth($api_key,$api_secret,$access_token,$access_token_secret);
-        // dd(Auth::User()->twitter_id);
-        // $apiData = $twObj->get("lists/members/show", ["list_id" => "1565027332947329024", "screen_name" => "iphoneTaro_live"]);
-        $apiData = $twObj->get("lists/members/show", ["list_id" => "1565027433249927168", "screen_name" => "iphoneTaro_live"]);
+        $titleStr = "あいうえおかきくけこあいうえおかきく";
+        $outlineStr = "あいうえおかきくけおあいうえおかきくけこあいうえおかきくけこあいうえおかきくけこあいうえおかきくけこあいうえおかきくけこあいうえおかきくけこあいうえおかきくけこあいうえおかきくけこあいうえおかきくけこあいうえおかきくけこあいうえおかきくけこあいうえおかきくけこあいうえおかきくけこあいうえおかきくけこあいうえおかきくけこあいうえおかきくけこあいうえおかきくけこあいうえおかきくけこあいうえおかきくけそ";
 
-        if (property_exists($apiData, 'errors')) {
-            dd("リストじゃない");
+        $tLen = 25;
+        $tPosiY = 40;
+        $oLen = 30;
+        
+        if (mb_strlen($titleStr) > $tLen) {
+            $title = mb_substr($titleStr, 0, $tLen) . "\n" . mb_substr($titleStr, $tLen);
+            $tPosiY = 30;
         } else {
-            dd("リストだよ");
+            $title = $titleStr;
         }
-        // $apiData = $twObj->get("users/show", ["screen_name" => "iphoneTaro_live"]);
-        dd($apiData);
 
-        // $statuses = $twObj->get("users/lookup", ["screen_name" => "iphoneTaro_live"]);
-        // $jsonData = json_decode($statuses, true);
-        // $list = array();
-        // foreach ($apiData as $data) {
-        //     array_push($list, ['id' => $data->id, 'name' => $data->name]);
-        // }
-        // dd($list);
-
-        $vRequest = $twObj->OAuthRequest("http://api.twitter.com/1.1/friendships/lookup.xml","GET",array('screen_name' => 'kfukuda413,twitwi_info'));
-
-        //XMLデータをsimplexml_load_string関数を使用してオブジェクトに変換する
-        $oXml = simplexml_load_string($vRequest);
-
-        //オブジェクトを展開
-        if(isset($oXml->error) && $oXml->error != ''){
-            echo "取得に失敗しました。<br/>\n";
-            echo "パラメーターの指定を確認して下さい。<br/>\n";
-            echo "エラーメッセージ:".$oXml->error."<br/>\n";
-        }else{
-            foreach($oXml as $oFriendships){
-                echo "<p>自分と → <b>userid(".$oFriendships->id.") screen_name(".$oFriendships->screen_name.") username(".$oFriendships->name.")</b> との関係は、<br/>\n";
-                foreach($oFriendships->connections->connection as $connection){
-                    echo "-".$connection."<br/>\n";
+        $outline = "";
+        $c = 0;
+        while ($outlineStr != "") {
+            if (mb_strlen($outlineStr) > $oLen) {
+                if ($outline == "") {
+                    $outline = mb_substr($outlineStr, 0, $oLen);
+                } else {
+                    $outline = $outline . "\n" . mb_substr($outlineStr, 0, $oLen);
                 }
+                $outlineStr = mb_substr($outlineStr, $oLen);
+            } else {
+                if ($outline == "") {
+                    $outline = $outlineStr;
+                } else {
+                    $outline = $outline . "\n" . $outlineStr;
+                }
+                $outlineStr = "";
             }
         }
 
-        return response()->json(['json' => $json, 'header' => $header]); 
+        $draw->setFont(realpath("./") . "/app/font.otf");
+        $draw->setFontSize(18);
+        $draw->setFillColor("black");
+        $draw->setTextInterlineSpacing(5);
+        $cardBase->annotateImage($draw, 130, $tPosiY, 0, $title);
+        $cardBase->annotateImage($draw, 70, 130, 0, $outline);
+
+        // $filePath = $_FILES["iconFile"]["tmp_name"];
+        // $icon = new Imagick($filePath);
+        // $iW = $icon->getImageWidth();
+        // $iH = $icon->getImageHeight();
+        // $iSize = $iW;
+        // if ($iW > $iH) {
+        //     $iSize = $iH;
+        // }
+        // $icon->cropThumbnailImage($iSize, $iSize);
+
+        // $icon->sampleImage(50, 50);
+        // $icon->roundCorners(50, 50);
+
+        // $cardBase->compositeImage($icon, Imagick::COMPOSITE_DEFAULT , 600, 10);
+
+
+        $cardBase->writeImage(realpath("./") . '/app/img/card_base2.jpg');
     }
+
+
+    // 公開リスト取得
+    // フォロー関係取得
+    //リツイート　statuses/show　のretweeted true/false
+    // public function test(Request $request): JsonResponse {
+    //     // dd($request->aaa . "  " . $request->bbb);
+    //     $api_key = Consts::TWITTER_API_KEY;		// APIキー
+    //     $api_secret = Consts::TWITTER_API_SECRET;		// APIシークレット
+
+    //     $userData = Auth::User();
+    //     $access_token = $userData->twitter_token;		// アクセストークン
+    //     $access_token_secret = $userData->twitter_token_secret;		// アクセストークンシークレット   
+    //     // dd($access_token . " " . $access_token_secret);
+
+    //     $twObj = new TwitterOAuth($api_key,$api_secret,$access_token,$access_token_secret);
+    //     // dd(Auth::User()->twitter_id);
+    //     // $apiData = $twObj->get("lists/members/show", ["list_id" => "1565027332947329024", "screen_name" => "iphoneTaro_live"]);
+    //     $apiData = $twObj->get("lists/members/show", ["list_id" => "1565027433249927168", "screen_name" => "iphoneTaro_live"]);
+
+    //     if (property_exists($apiData, 'errors')) {
+    //         dd("リストじゃない");
+    //     } else {
+    //         dd("リストだよ");
+    //     }
+    //     // $apiData = $twObj->get("users/show", ["screen_name" => "iphoneTaro_live"]);
+    //     dd($apiData);
+
+    //     // $statuses = $twObj->get("users/lookup", ["screen_name" => "iphoneTaro_live"]);
+    //     // $jsonData = json_decode($statuses, true);
+    //     // $list = array();
+    //     // foreach ($apiData as $data) {
+    //     //     array_push($list, ['id' => $data->id, 'name' => $data->name]);
+    //     // }
+    //     // dd($list);
+
+    //     $vRequest = $twObj->OAuthRequest("http://api.twitter.com/1.1/friendships/lookup.xml","GET",array('screen_name' => 'kfukuda413,twitwi_info'));
+
+    //     //XMLデータをsimplexml_load_string関数を使用してオブジェクトに変換する
+    //     $oXml = simplexml_load_string($vRequest);
+
+    //     //オブジェクトを展開
+    //     if(isset($oXml->error) && $oXml->error != ''){
+    //         echo "取得に失敗しました。<br/>\n";
+    //         echo "パラメーターの指定を確認して下さい。<br/>\n";
+    //         echo "エラーメッセージ:".$oXml->error."<br/>\n";
+    //     }else{
+    //         foreach($oXml as $oFriendships){
+    //             echo "<p>自分と → <b>userid(".$oFriendships->id.") screen_name(".$oFriendships->screen_name.") username(".$oFriendships->name.")</b> との関係は、<br/>\n";
+    //             foreach($oFriendships->connections->connection as $connection){
+    //                 echo "-".$connection."<br/>\n";
+    //             }
+    //         }
+    //     }
+
+    //     return response()->json(['json' => $json, 'header' => $header]); 
+    // }
 }

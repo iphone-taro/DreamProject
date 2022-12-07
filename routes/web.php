@@ -47,10 +47,12 @@ Route::post('/api/contact', [DreamController::class, 'contact']);
 
 Route::get('/api/tete', [CookieAuthenticationController::class, 'tete']);
 
+Route::post('/api/test', [DreamController::class, 'test']);
 
+//twitterカード用
+Route::get('/reading/{id}', [DreamController::class, 'snsAction']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/api/test', [DreamController::class, 'test']);
 
     Route::get('/api/getBaseInfo', [DreamController::class, 'getBaseInfo']);
 
@@ -100,7 +102,11 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 Route::get('/{any}', function () {
-    return view('spa.app')->with('test', "card");
+    $title = "yumedrop";
+    $cardName = "card_base.jpg";
+    $description = "ユメドロップの説明です";
+
+    return view('spa.app')->with(['card' => $cardName, 'title' => $title, 'description' => $description]);
 })->where('any', '.*');
 // Route::get('/{any}', function () {
 //     return view('spa.app');
