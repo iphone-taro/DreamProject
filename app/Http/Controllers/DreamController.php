@@ -53,7 +53,7 @@ class DreamController extends Controller
                 //カード画像データがあるか
                 if (file_exists('../storage/app/public/card/card_' . $postId . '.jpg')) { 
                     //結果画像ある
-                    $card = 'card_' . $postId . '.jpg';
+                    $card = 'card_' . $postId . '.jpg'; 
                 }
             }
         }
