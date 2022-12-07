@@ -102,7 +102,7 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 Route::get('/{any}', function () {
-    $title = "yumedrop";
+    $title = "yumedrop"; 
     $cardName = "card_base.jpg";
     $description = "ユメドロップの説明です";
 

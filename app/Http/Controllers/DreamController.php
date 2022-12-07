@@ -47,7 +47,7 @@ class DreamController extends Controller
             
             if ($postData != null) {
                 //データあり
-                $title = $postData->title;
+                $title = $postData->title; 
                 $description = $postData->outline;
 
                 //カード画像データがあるか
