@@ -328,9 +328,9 @@ final class CookieAuthenticationController extends Controller
             
             //メール送信
             $mailTitle = Consts::MAIL_TITLE_PASS_COMP;
-            $mailBody = str_replace("###", $tempData->temp_id, Consts::MAIL_BODY_PASS_COMP);
-            $mailAddress = $userData->mail_address;
-            Mail::send(new MailMgr($mailTitle, $mailBody, $mailAddress));
+            $mailBody = Consts::MAIL_BODY_PASS_COMP;
+            $mailEmail = $userData->mail_address;
+            Mail::send(new MailMgr($mailTitle, $mailBody, $mailEmail));
 
             return response()->json(['status' => Consts::API_SUCCESS]);
         } else {
@@ -580,7 +580,7 @@ final class CookieAuthenticationController extends Controller
 
             $newUser = new user; 
             $newUser->user_id = $userId;
-            $newUser->user_name = 'ドロップユーザー';
+            $newUser->user_name = 'ユメドロップユーザー';
             $newUser->profile = 'はじめまして';
             $newUser->twitter_id = '';
             $newUser->mail_address = $tempData->mail_address;
@@ -602,7 +602,6 @@ final class CookieAuthenticationController extends Controller
                     //メール送信
                     $mailTitle = Consts::MAIL_TITLE_MAIL_NEW_COMP;
                     $mailBody = Consts::MAIL_BODY_MAIL_NEW_COMP;
-                    $mailBody = str_replace("###", $tempData->temp_id, $mailBody);
                     Mail::send(new MailMgr($mailTitle, $mailBody, $mailEmail));
 
 
@@ -635,7 +634,6 @@ final class CookieAuthenticationController extends Controller
                 $mailTitle = Consts::MAIL_TITLE_MAIL_ADD_COMP;
                 $mailBody = Consts::MAIL_BODY_MAIL_ADD_COMP;    
             }
-            $mailBody = str_replace("###", $tempData->temp_id, $mailBody);
             Mail::send(new MailMgr($mailTitle, $mailBody, $mailEmail));
 
             //tempテーブルからデータを削除
@@ -695,8 +693,7 @@ final class CookieAuthenticationController extends Controller
             //メール送信
             $mailTitle = Consts::MAIL_TITLE_PASS_COMP;
             $mailBody = Consts::MAIL_BODY_PASS_COMP;
-            $mailBody = str_replace("###", $tempData->temp_id, $mailBody);
-            $mailAddress = $userData->mail_address;
+            $mailEmail = $userData->mail_address;
 
             Mail::send(new MailMgr($mailTitle, $mailBody, $mailEmail));
 

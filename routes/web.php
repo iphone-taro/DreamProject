@@ -80,6 +80,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/api/updateSettingFavorite', [DreamController::class, 'updateSettingFavorite']);
     Route::post('/api/updateSettingMute', [DreamController::class, 'updateSettingMute']);
     Route::post('/api/updateSettingShowTwitter', [DreamController::class, 'updateSettingShowTwitter']);
+    Route::post('/api/updateSettingReceiveInfo', [DreamController::class, 'updateSettingReceiveInfo']);
     Route::post('/api/updateSettingRestrictions', [DreamController::class, 'updateSettingRestrictions']);
     Route::post('/api/deleteUser', [DreamController::class, 'deleteUser']);
 
@@ -104,7 +105,7 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::get('/{any}', function () {
     $title = "yumedrop"; 
     $cardName = "card_base.jpg";
-    $description = "ユメドロップの説明です";
+    $description = "夢小説投稿サイトです";
 
     return view('spa.app')->with(['card' => $cardName, 'title' => $title, 'description' => $description]);
 })->where('any', '.*');

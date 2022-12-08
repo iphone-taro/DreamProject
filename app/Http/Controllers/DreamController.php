@@ -28,18 +28,18 @@ use Abraham\TwitterOAuth\TwitterOAuth;
 class DreamController extends Controller
 {   
     //
-    // SNSカード
+    // SNS用設定
     //
     public function snsAction($id) {
-        $title = "yumedrop(SNSACTION)";
-        $description = "説明です（SNSACTION）";
+        $title = "yumedrop 作品ページ";
+        $description = "yumedropに投稿された作品のページです";
         // $card = "https://iphone-taro.sakura.ne.jp/yumedrop/storage/card/";
         $card = "card_base.jpg";
 
         //パラメータあり
         $postId = $id;
 
-        //クイズID照合
+        //照合
         if (mb_strlen($postId) == 20) {
             //長さOK
             //DB照合
@@ -50,11 +50,11 @@ class DreamController extends Controller
                 $title = $postData->title; 
                 $description = $postData->outline;
 
-                //カード画像データがあるか
-                if (file_exists('../storage/app/public/card/card_' . $postId . '.jpg')) { 
-                    //結果画像ある
-                    $card = 'card_' . $postId . '.jpg'; 
-                }
+                // //カード画像データがあるか
+                // if (file_exists('../storage/app/public/card/card_' . $postId . '.jpg')) { 
+                //     //結果画像ある
+                //     $card = 'card_' . $postId . '.jpg'; 
+                // }
             }
         }
         $header = ['card' => $card, 'title' => $title, 'description' => $description];
@@ -1076,9 +1076,25 @@ class DreamController extends Controller
 
         $postList = \DB::select($sql);
 
+        //リンクの一覧取得
+        $linkArray = array();
+        if ($targetUserData->link_0_0 != "") {
+            array_push($linkArray, [$targetUserData->link_0_0, $targetUserData->link_0_1]);
+        }
+        if ($targetUserData->link_1_0 != "") {
+            array_push($linkArray, [$targetUserData->link_1_0, $targetUserData->link_1_1]);
+        }
+        if ($targetUserData->link_2_0 != "") {
+            array_push($linkArray, [$targetUserData->link_2_0, $targetUserData->link_2_1]);
+        }
+        if ($targetUserData->link_3_0 != "") {
+            array_push($linkArray, [$targetUserData->link_3_0, $targetUserData->link_3_1]);
+        }
+
         $retArray = $retArray + array('postList' => $postList);
         $retArray = $retArray + array('status' => Consts::API_SUCCESS);
         $retArray = $retArray + array('baseInfo' => $this->retUserInfo());
+        $retArray = $retArray + array('linkList' => $linkArray);
 
         return response()->json($retArray);
     }
@@ -1148,13 +1164,32 @@ class DreamController extends Controller
     }
 
     //
-    //設定 － 設定情報取得（ミュートの一覧取得だけ？）
+    //設定 － 設定情報取得
     //
     public function getSettingInfo(Request $request): JsonResponse {
         $muteList = mute::LEFTJOIN('users', 'mutes.mute_id', '=', 'users.user_id')->where('mutes.user_id', Auth::User()->user_id)
         ->get(['mutes.mute_id', 'users.user_name']);
 
-        return response()->json(['status' => Consts::API_SUCCESS, 'muteList' => $muteList, 'baseInfo' => $this->retUserInfo()]);
+        //リンクの一覧取得
+        $userData = Auth::User();
+        $linkArray = array();
+        if ($userData->link_0_0 != "") {
+            array_push($linkArray, [$userData->link_0_0, $userData->link_0_1]);
+        }
+        if ($userData->link_1_0 != "") {
+            array_push($linkArray, [$userData->link_1_0, $userData->link_1_1]);
+        }
+        if ($userData->link_2_0 != "") {
+            array_push($linkArray, [$userData->link_2_0, $userData->link_2_1]);
+        }
+        if ($userData->link_3_0 != "") {
+            array_push($linkArray, [$userData->link_3_0, $userData->link_3_1]);
+        }
+        if(count($linkArray) == 0) {
+            array_push($linkArray, ["", ""]);
+        }
+
+        return response()->json(['status' => Consts::API_SUCCESS, 'muteList' => $muteList, 'baseInfo' => $this->retUserInfo(), 'linkList' => $linkArray]);
     }
 
     //
@@ -1168,6 +1203,14 @@ class DreamController extends Controller
             $validateArray = [
                 'userName' => 'required|max:10',
                 'profile' => 'required|max:400',
+                'link00' => 'max:20',
+                'link01' => 'max:200',
+                'link10' => 'max:20',
+                'link11' => 'max:200',
+                'link20' => 'max:20',
+                'link21' => 'max:200',
+                'link30' => 'max:20',
+                'link31' => 'max:200',
             ];
     
             if ($file != null) {
@@ -1198,6 +1241,14 @@ class DreamController extends Controller
         //情報を更新
         $userData->user_name = $userName;
         $userData->profile = $profile;
+        $userData->link_0_0 = $request->link00;
+        $userData->link_0_1 = $request->link01;
+        $userData->link_1_0 = $request->link10;
+        $userData->link_1_1 = $request->link11;
+        $userData->link_2_0 = $request->link20;
+        $userData->link_2_1 = $request->link21;
+        $userData->link_3_0 = $request->link30;
+        $userData->link_3_1 = $request->link31;
         // $userData->updated_at = date("Y/m/d H:i:s");
 
         try {
@@ -1318,6 +1369,23 @@ class DreamController extends Controller
 
         //情報を更新
         $userData->show_twitter = $showTwitter;
+        // $userData->updated_at = date("Y/m/d H:i:s");
+        $userData->save();
+
+        return response()->json(['status' => Consts::API_SUCCESS, 'baseInfo' => $this->retUserInfo()]);
+    }
+
+    //
+    //設定 － お知らせ
+    //
+    public function updateSettingReceiveInfo(Request $request): JsonResponse {
+        $val = $request->receiveInfo;
+
+        //ユーザー情報を取得
+        $userData = Auth::User();
+
+        //情報を更新
+        $userData->receive_info = $val;
         // $userData->updated_at = date("Y/m/d H:i:s");
         $userData->save();
 
