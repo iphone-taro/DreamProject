@@ -1,0 +1,3 @@
+ads_001.png,http://www.yahoo.co.jp
+ads_002.png,http://google.co.jp
+ads_003.png,http://https://www.rakuten.co.jp/

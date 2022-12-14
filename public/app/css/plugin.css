@@ -1,4 +1,9 @@
 /* チェックボックス */
+#CHK {
+	display:flex;
+	padding:0;
+}
+
 #CHK label{
 	margin-bottom:15px;
 	padding-left:30px;
@@ -111,7 +116,7 @@
 }
 
 #CHK span {
-	padding:5px 0 0 5px
+	/* padding:5px 0 0 5px */
 }
 
 

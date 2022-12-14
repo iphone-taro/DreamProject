@@ -50,7 +50,9 @@ Route::get('/api/tete', [CookieAuthenticationController::class, 'tete']);
 Route::post('/api/test', [DreamController::class, 'test']);
 
 //twitterカード用
-Route::get('/reading/{id}', [DreamController::class, 'snsAction']);
+// Route::get('/reading/{id}', [DreamController::class, 'snsAction']);
+
+Route::get('/api/getAds', [DreamController::class, 'getAds']);
 
 Route::middleware('auth:sanctum')->group(function () {
 

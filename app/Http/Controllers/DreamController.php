@@ -28,6 +28,19 @@ use Abraham\TwitterOAuth\TwitterOAuth;
 class DreamController extends Controller
 {   
     //
+    //広告情報取得
+    //
+    public function getAds(): JsonResponse {
+        $ads = file('../resources/ads.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        $retArray = array();
+        for ($i=0; $i < count($ads); $i++) { 
+            $adInfo = explode(',',  $ads[$i]);
+            array_push($retArray, ['file' => $adInfo[0], 'url' => $adInfo[1]]);
+        }
+        return response()->json(['ads' => $retArray]);
+    }
+
+    //
     // SNS用設定
     //
     public function snsAction($id) {

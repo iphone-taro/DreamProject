@@ -1,9 +1,6 @@
 @import "https://use.fontawesome.com/releases/v5.13.0/css/all.css";
 
-* {
-	/* border: 1px solid !important; */
-    white-space: pre-line;
-}
+
 
 .popupBodyCenter {
     text-align:center
@@ -58,21 +55,41 @@ body {
 
 .k_ti {
     font-size:14px;
-    margin-bottom: 0px;
+    margin-bottom: 5px;
+    display:flex;
+    align-items:center;
 }
 
 .k_mi {
-    margin-bottom: 7px;
+    font-size:12px;
+    margin-bottom: 0px;
+    display:flex;
+    align-items:center;
+}
+
+.k_mi > * {
+    white-space: nowrap;
+    
+}
+
+.sp_line_0 {
+    /* border : 1px solid red; */
+    height : 0px;
+}
+
+.sp_line_ss {
+    /* border : 1px solid red; */
+    height : 5px;
 }
 
 .sp_line_s {
     /* border : 1px solid red; */
-    height : 11px;
+    height : 10px;
 }
 
 .sp_line_m {
     /* border : 1px solid blue; */
-    height : 13px;
+    height : 15px;
 }
 
 .sp_line_l {
@@ -272,6 +289,11 @@ body {
     color: #211F1E;
 }
 
+.al-center {
+    display: flex;
+    align-items: center; 
+}
+
 .link {
     text-decoration: none !important;
     font-size: 12px !important;
@@ -393,6 +415,7 @@ input:-webkit-autofill {
     font-size: 6px;
     text-align:right;
     margin:0;
+    width:100%;
 }
 
 .annotMsg {
