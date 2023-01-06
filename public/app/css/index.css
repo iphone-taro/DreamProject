@@ -65,6 +65,7 @@ body {
     margin-bottom: 0px;
     display:flex;
     align-items:center;
+    margin-bottom:5px;
 }
 
 .k_mi > * {
@@ -341,7 +342,8 @@ input:-webkit-autofill {
 .searchBox-text {
     position:absolute; 
     left:0;
-    top:0; 
+    top:0;
+    padding-right:40px
 }
 .searchBox-btn {
     position:absolute; 
@@ -582,6 +584,25 @@ input:-webkit-autofill {
     background: url("../img/btnicon/btnicon_bookmark_on_4.png") no-repeat;
 }
 
+.btn-icon-sns-on:before {
+    background: url("../img/btnicon/btnicon_sns_on.png") no-repeat;
+    width: 14px;
+    height: 14px;
+}
+
+.btn-icon-sns_on_1:before {
+    background: url("../img/btnicon/btnicon_sns_on_1.png") no-repeat;
+}
+.btn-icon-sns-on_2:before {
+    background: url("../img/btnicon/btnicon_sns_on_2.png") no-repeat;
+}
+.btn-icon-sns-on_3:before {
+    background: url("../img/btnicon/btnicon_sns_on_3.png") no-repeat;
+}
+.btn-icon-sns-on_4:before {
+    background: url("../img/btnicon/btnicon_sns_on_4.png") no-repeat;
+}
+
 .btn-icon-bookmark-off:before {
     background: url("../img/btnicon/btnicon_bookmark_off.png") no-repeat;
     width: 16px;
@@ -617,6 +638,11 @@ input:-webkit-autofill {
 .side {
     width:100%;
 }
+
+.topImgWidth {
+    width:100%;
+}
+
 @media screen and (min-width : 576px) {
     /* body {
         font-size:14px;
@@ -629,6 +655,10 @@ input:-webkit-autofill {
     .tipsPopup {
         width:700px;
     }
+
+    .topImgWidth {
+        width:750px;
+    }   
 }
 
 @media screen and (min-width : 1000px) {

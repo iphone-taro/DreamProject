@@ -155,12 +155,12 @@ final class CookieAuthenticationController extends Controller
                 'mailAddress' => 'required|max:200|string',
             ]);
         } catch (ValidationException $e) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
         }
 
         //メールアドレスチェック
         if ($this->checkAddress($request->mailAddress)) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => "MailAddress"]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => "MailAddress"]);
         }
 
         //メールアドレスから存在チェック
@@ -260,7 +260,7 @@ final class CookieAuthenticationController extends Controller
                 'tempId' => 'required|string|size:20',
             ]);
         } catch (ValidationException $e) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
         }
 
         //対象のデータをtempから取得
@@ -279,7 +279,7 @@ final class CookieAuthenticationController extends Controller
             return response()->json(['status' => Consts::API_FAILED_NODATA, 'errMsg' => 'USER']);
         }
 
-        return response()->json(['status' => Consts::API_SUCCESS]);
+        return response()->json(['status' => Consts::API_SUCCESS, 'auth' => Auth::check()]);
     }
 
     //
@@ -294,12 +294,12 @@ final class CookieAuthenticationController extends Controller
                 'newPassword' => 'required|min:8|max:32',
             ]);
         } catch (ValidationException $e) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
         }
         
         //パスワードの正規表現チェック
         if (preg_match(Consts::REGEX_PASSWORD, $request->newPassword) == 0) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
         }
         
         //対象のデータをtempから取得
@@ -353,7 +353,7 @@ final class CookieAuthenticationController extends Controller
 
             //kbnチェック
             if ($kbn != 'NEW' && $kbn != 'ADD' && $kbn != 'CHANGE') {
-                return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => "区分エラー"]);
             }
 
             if ($kbn == "NEW" || $kbn == "ADD") {
@@ -364,16 +364,16 @@ final class CookieAuthenticationController extends Controller
 
                 //パスワードの正規表現チェック
                 if (preg_match(Consts::REGEX_PASSWORD, $request->password) == 0) {
-                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
                 }
             }
         } catch (ValidationException $e) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
         }
 
         //メールアドレスチェック
         if ($this->checkAddress($request->mailAddress)) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => "MailAddress"]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => "MailAddress"]);
         }
         
         //メールアドレスから存在チェック
@@ -384,7 +384,7 @@ final class CookieAuthenticationController extends Controller
             return response()->json(['status' => Consts::API_FAILED_DUPLICATE, 'errMsg' => 'メールアドレス重複'. $request->mailAddress]);
         }
 
-        //一時テーブルに挿入
+        //一時テーブルから取得
         $tempData = Temp::where('mail_address', $request->mailAddress)->where('temp_kbn', $kbn)->first();            
        
         //メール設定
@@ -527,19 +527,23 @@ final class CookieAuthenticationController extends Controller
                 'tempId' => 'required|string|size:20',
             ]);
         } catch (ValidationException $e) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
         }
         
-        //対象のデータをtempから取得
+        //対象のデータをtempから取得 A and (B or C or D)
         $tempData = Temp::where('temp_id', $request->tempId)
             ->where(function($query) {
-                $query->where('temp_kbn', '=', 'ADD')->whereNotNull('password');})
+                $query->where(function($query) {
+                    $query->where('temp_kbn', '=', 'ADD')->whereNotNull('password');
+                })
                 ->orWhere(function($query) {
-                    $query->where('temp_kbn', '=', 'NEW')->whereNotNull('password');})
+                    $query->where('temp_kbn', '=', 'NEW')->whereNotNull('password');
+                })
                 ->orWhere(function($query) {
-                    $query->where('temp_kbn', '=', 'CHANGE')->whereNull('password');})
-                ->where('limit_date', '>=', date("Y/m/d H:i:s"))->first();
-
+                    $query->where('temp_kbn', '=', 'CHANGE')->whereNull('password');
+                });
+            })
+            ->where('limit_date', '>=', date("Y/m/d H:i:s"))->get()->first();
         if ($tempData == null) {
             //メールアドレスの対象データなし
             return response()->json(['status' => Consts::API_FAILED_NODATA, 'errMsg' => 'TEMP']);
@@ -606,7 +610,7 @@ final class CookieAuthenticationController extends Controller
 
 
                     DB::commit();                 
-                    return response()->json(['status' => Consts::API_SUCCESS, 'kbn' => $kbn]);
+                    return response()->json(['status' => Consts::API_SUCCESS, 'kbn' => $kbn, 'auth' => Auth::check()]);
                 } else {
                     DB::rollBack();
                     return response()->json(['status' => Consts::API_FAILED_EXEPTION, 'errMsg' => '本登録エラー']);
@@ -643,7 +647,7 @@ final class CookieAuthenticationController extends Controller
             Auth::logout();
 
             if ($flg) {
-                return response()->json(['status' => Consts::API_SUCCESS, 'kbn' => $kbn]);
+                return response()->json(['status' => Consts::API_SUCCESS, 'kbn' => $kbn, 'auth' => Auth::check()]);
             } else {
                 return response()->json(['status' => Consts::API_FAILED_EXEPTION, 'errMsg' => 'メール追加エラー']);
             }
@@ -661,19 +665,19 @@ final class CookieAuthenticationController extends Controller
                 'newPassword' => 'required|min:8|max:32',
             ]);
         } catch (ValidationException $e) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
         }
 
         $userData = Auth::User();
 
         //パスワードの正規表現チェック
         if (preg_match(Consts::REGEX_PASSWORD, $request->currentPassword) == 0) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
         }
 
         //パスワードの正規表現チェック
         if (preg_match(Consts::REGEX_PASSWORD, $request->newPassword) == 0) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
         }
 
         // $chkData = user::where('user_id', $userData->user_id)->where('password', password_hash($request->currentPassword, PASSWORD_DEFAULT))->first();
@@ -716,13 +720,13 @@ final class CookieAuthenticationController extends Controller
                 'twitterTokenSecret' => 'required',
             ]);
         } catch (ValidationException $e) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
         }
 
         //排他チェック
         $chkData = user::where('twitter_id', $request->twitterId)->first();
         if ($chkData != null) {
-            return response()->json(['status' => Consts::API_FAILED_DUPLICATE, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_DUPLICATE, 'errMsg' => $e->getMessage()]);
         }
 
         //ユーザーデータ取得
@@ -796,17 +800,17 @@ final class CookieAuthenticationController extends Controller
                 'password' => 'required|min:8|max:32',
             ]);
         } catch (ValidationException $e) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
         }
         
         //メールアドレスチェック
         if ($this->checkAddress($request->mailAddress)) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => "MailAddress"]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => "MailAddress"]);
         }
 
         //パスワードの正規表現チェック
         if (preg_match(Consts::REGEX_PASSWORD, $request->password) == 0) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
         }
 
         $mess = $request->mailAddress . " " . $request->password;
@@ -838,7 +842,7 @@ final class CookieAuthenticationController extends Controller
                 'twitterTokenSecret' => 'required',
             ]);
         } catch (ValidationException $e) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
         }
 
         //ユーザーテーブルから該当を取得
@@ -857,7 +861,7 @@ final class CookieAuthenticationController extends Controller
 
             if (!$flg) {
                 //更新エラー
-                return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => 'twitterCode更新エラー']);
+                return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => 'twitterCode更新エラー']);
             }
 
             //データがある場合、ログイン成功
@@ -884,7 +888,7 @@ final class CookieAuthenticationController extends Controller
                 'twitterTokenSecret' => 'required',
             ]);
         } catch (ValidationException $e) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
         }
 
         //ユーザーテーブルから該当を取得

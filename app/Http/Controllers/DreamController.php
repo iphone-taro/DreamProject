@@ -221,7 +221,7 @@ class DreamController extends Controller
                 'filter' => 'required|string|size:14',
             ]);
         } catch (ValidationException $e) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
         }
 
         $filterStr = $request->filter;
@@ -262,7 +262,7 @@ class DreamController extends Controller
 		($fConversion0 != 0 && $fConversion0 != 1) ||
 		($fConversion1 != 0 && $fConversion1 != 1)) {
             //フィルターチェック
-			return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+			return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
 		}
         
         //対象ページ
@@ -634,12 +634,12 @@ class DreamController extends Controller
                 'series' => 'required|max:50',
             ]);
         } catch (ValidationException $e) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
         }
         
         $userId = Auth::User()->user_id;
         $title = $request->title;
-        $outline = $request->outline;
+        $outline = str_replace("　", " ", $request->outline);
         $body = $request->body;
         $conversion = $request->conversion;
         $series = $request->series;
@@ -662,7 +662,7 @@ class DreamController extends Controller
         //表現規制チェック
         if (!$this->checkRegulation($title) || !$this->checkRegulation($outline) || !$this->checkRegulation($body) || !$this->checkRegulation($series)) {
             //異常値エラー
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => ""]);
         }
 
         //異常値チェック
@@ -673,7 +673,7 @@ class DreamController extends Controller
         ($publishing != 0 && $publishing != 1 && $publishing != 2 && $publishing != 3 && $publishing != 4 && $publishing != 99) ||
         ($searchable != 0 && $searchable != 1)) {
             //異常値エラー
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => ""]);
         }
 
         //公開方法別チェック
@@ -685,7 +685,7 @@ class DreamController extends Controller
                     'publishingSub2' => 'required|max:50',
                 ]);
             } catch (ValidationException $e) {
-                return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+                return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
             }
         } else if ($publishing == 4) {
             //リスト
@@ -694,7 +694,7 @@ class DreamController extends Controller
                     'publishingSub1' => 'required|max:200',
                 ]);
             } catch (ValidationException $e) {
-                return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+                return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
             }
             $publishingSub2 = "";
         } else {
@@ -708,16 +708,16 @@ class DreamController extends Controller
             $conversionArray = explode(Consts::CONVERSION2, $conversion);
             if (count($conversionArray) > 4) {
                 //異常値エラー
-                return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => ""]);
             }
             for ($i=0; $i < count($conversionArray); $i++) { 
                 $con = explode(Consts::CONVERSION1, $conversionArray[$i]);
                 if ($con[0] == "" || $con[1] == "" || mb_strlen($con[0]) > 10 || mb_strlen($con[1]) > 20) {
                     //異常値エラー
-                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => ""]);
                 } else if (!$this->checkRegulation($con[0]) || !$this->checkRegulation($con[1])) {
                     //異常値エラー
-                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => ""]);
                 } 
             }
         }
@@ -728,15 +728,15 @@ class DreamController extends Controller
             $tagArray = explode(',', $tags);
             if (count($tagArray) > 8) {
                 //異常値エラー
-                return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => ""]);
             }
             for ($i=0; $i < count($tagArray); $i++) { 
                 if (mb_strlen($tagArray[$i]) > 21) {
                     //異常値エラー
-                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => ""]);
                 } else if (!$this->checkRegulation($tagArray[$i])) {
                     //異常値エラー
-                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => ""]);
                 } 
             }
         }
@@ -798,12 +798,12 @@ class DreamController extends Controller
                 'series' => ['required'],
            ]);
         } catch (ValidationException $e) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
         }
 
         $postId = $request->postId;
         $title = $request->title;
-        $outline = $request->outline;
+        $outline = str_replace("　", " ", $request->outline);
         $body = $request->body;
         $conversion = $request->conversion;
         $series = $request->series;
@@ -826,7 +826,7 @@ class DreamController extends Controller
         //表現規制チェック
         if (!$this->checkRegulation($title) || !$this->checkRegulation($outline) || !$this->checkRegulation($body) || !$this->checkRegulation($series)) {
             //異常値エラー
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => ""]);
         }
         
         //異常値チェック
@@ -837,7 +837,7 @@ class DreamController extends Controller
         ($publishing != 0 && $publishing != 1 && $publishing != 2 && $publishing != 3 && $publishing != 4 && $publishing != 99) ||
         ($searchable != 0 && $searchable != 1)) {
             //異常値エラー
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => ""]);
         }
 
         //公開方法別チェック
@@ -849,7 +849,7 @@ class DreamController extends Controller
                     'publishingSub2' => 'required|max:200',
                 ]);
             } catch (ValidationException $e) {
-                return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+                return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
             }
         } else if ($publishing == 4) {
             //リスト
@@ -858,7 +858,7 @@ class DreamController extends Controller
                     'publishingSub1' => 'required|max:200',
                 ]);
             } catch (ValidationException $e) {
-                return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+                return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
             }
             $publishingSub2 = "";
         } else {
@@ -872,17 +872,17 @@ class DreamController extends Controller
             $conversionArray = explode(Consts::CONVERSION2, $conversion);
             if (count($conversionArray) > 4) {
                 //異常値エラー
-                return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => ""]);
             }
             
             for ($i=0; $i < count($conversionArray); $i++) { 
                 $con = explode(Consts::CONVERSION1, $conversionArray[$i]);
                 if ($con[0] == "" || $con[1] == "" || mb_strlen($con[0]) > 10 || mb_strlen($con[1]) > 20) {
                     //異常値エラー
-                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => ""]);
                 } else if (!$this->checkRegulation($con[0]) || !$this->checkRegulation($con[1])) {
                     //異常値エラー
-                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => ""]);
                 } 
             }    
         }
@@ -892,15 +892,15 @@ class DreamController extends Controller
             $tagArray = explode(',', $tags);
             if (count($tagArray) > 8) {
                 //異常値エラー
-                return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => ""]);
             }
             for ($i=0; $i < count($tagArray); $i++) { 
                 if (mb_strlen($tagArray[$i]) > 20) {
                     //異常値エラー
-                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => ""]);
                 } else if (!$this->checkRegulation($tagArray[$i])) {
                     //異常値エラー
-                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => ""]);
                 } 
             }
         }
@@ -1000,7 +1000,7 @@ class DreamController extends Controller
                 'targetId' => ['required'],
             ]);
         } catch (ValidationException $e) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
         }
 
         $userId = Auth::User()->user_id;
@@ -1013,7 +1013,7 @@ class DreamController extends Controller
         $targetUserData = user::where('user_id', $targetId)->first();
 
         if ($targetUserData == null) {
-            return response()->json(['status' => Consts::API_FAILED_NODATA, 'msg' => ""]);
+            return response()->json(['status' => Consts::API_FAILED_NODATA, 'errMsg' => ""]);
         }
         $retArray = $retArray + array('user_name' => $targetUserData->user_name);
         $retArray = $retArray + array('user_profile' => $targetUserData->profile);
@@ -1123,7 +1123,7 @@ class DreamController extends Controller
                 'value' => ['required'],
             ]);
         } catch (ValidationException $e) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
         }
 
         $followId = $request->followId;
@@ -1158,7 +1158,7 @@ class DreamController extends Controller
                 'value' => ['required'],
             ]);
         } catch (ValidationException $e) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
         }
 
         if ($value == 1) {
@@ -1233,7 +1233,7 @@ class DreamController extends Controller
 
             $validatedData = $request->validate($validateArray);
         } catch (ValidationException $e) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
         }
 
         $userName = $request->userName;
@@ -1245,7 +1245,7 @@ class DreamController extends Controller
         //表現規制チェック
         if (!$this->checkRegulation($userName) || !$this->checkRegulation($profile)) {
             //異常値エラー
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => ""]);
         }
 
         //ユーザー情報を取得
@@ -1312,15 +1312,15 @@ class DreamController extends Controller
             $tagArray = explode(',', $favorite);
             if (count($tagArray) > 8) {
                 //異常値エラー
-                return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => ""]);
             }
             for ($i=0; $i < count($tagArray); $i++) { 
                 if (mb_strlen($tagArray[$i]) > 20) {
                     //異常値エラー
-                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => ""]);
                 } else if (!$this->checkRegulation($tagArray[$i])) {
                     //異常値エラー
-                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => ""]);
                 } 
             }
         }
@@ -1347,15 +1347,15 @@ class DreamController extends Controller
             $tagArray = explode(',', $mute);
             if (count($tagArray) > 8) {
                 //異常値エラー
-                return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => ""]);
             }
             for ($i=0; $i < count($tagArray); $i++) { 
                 if (mb_strlen($tagArray[$i]) > 20) {
                     //異常値エラー
-                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => ""]);
                 } else if (!$this->checkRegulation($tagArray[$i])) {
                     //異常値エラー
-                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => ""]);
+                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => ""]);
                 } 
             }
         }
@@ -1446,7 +1446,7 @@ class DreamController extends Controller
                 'postId' => ['required'],
             ]);
         } catch (ValidationException $e) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
         }
 
         $postId = $request->postId;
@@ -1529,7 +1529,7 @@ class DreamController extends Controller
                 'value' => ['required'],
             ]);
         } catch (ValidationException $e) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
         }
 
         $postId = $request->postId;
@@ -1562,7 +1562,7 @@ class DreamController extends Controller
                 'stamp' => ['required'],
             ]);
         } catch (ValidationException $e) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
         }
 
         //スタンプの上限確認
@@ -1570,7 +1570,7 @@ class DreamController extends Controller
 
         if (count($stampList) >= 10) {
             //スタンプ上限
-            return response()->json(['status' => Consts::API_FAILED_LIMIT, 'msg' => ""]);
+            return response()->json(['status' => Consts::API_FAILED_LIMIT, 'errMsg' => ""]);
         }
         // dd(count($stampList));
         DB::table('stamps')->insert([
@@ -1592,7 +1592,7 @@ class DreamController extends Controller
                 'postId' => ['required'],
             ]);
         } catch (ValidationException $e) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
         }
         
         //投稿データ取得
@@ -1660,7 +1660,7 @@ class DreamController extends Controller
                 'postId' => ['required']
             ]);
         } catch (ValidationException $e) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
         }
 
         $postId = $request->postId;
@@ -1684,7 +1684,7 @@ class DreamController extends Controller
                 'body' => 'required',
             ]);
         } catch (ValidationException $e) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
         } 
 
         //メール本文作成
@@ -1712,7 +1712,7 @@ class DreamController extends Controller
                 'kbn' => 'required',
             ]);
         } catch (ValidationException $e) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
         }
 
         //取得情報別処理
@@ -1800,7 +1800,7 @@ class DreamController extends Controller
                 'postId' => 'required',
             ]);
         } catch (ValidationException $e) {
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
         }
         
         $kbn = $request->kbn;
@@ -1812,16 +1812,16 @@ class DreamController extends Controller
 
         if ($postData == null) {
             //データなし
-            return response()->json(['status' => Consts::API_FAILED_NODATA, 'msg' => ""]);
+            return response()->json(['status' => Consts::API_FAILED_NODATA, 'errMsg' => ""]);
         } else if ($postData->pupblishing == "99") {
             //非公開
-            return response()->json(['status' => Consts::API_FAILED_PRIVATE, 'msg' => ""]);
+            return response()->json(['status' => Consts::API_FAILED_PRIVATE, 'errMsg' => ""]);
         }
         
         if (($postData->publishing == "1" && $kbn != "PASSWORD") || ($postData->publishing == "2" && $kbn != "TWITTER_SOUGO") || 
         ($postData->publishing == "3" && $kbn != "TWITTER_FOLLOW") || ($postData->publishing == "4" && $kbn != "TWITTER_LIST")) {
             //パラメータと公開方法が違う場合
-            return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
         }
         //公開方法別処理
         if ($kbn == "PASSWORD") {
@@ -1832,7 +1832,7 @@ class DreamController extends Controller
                     'password' => 'required',
                 ]);
             } catch (ValidationException $e) {
-                return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+                return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
             }
             $password = $request->password;
 
@@ -1852,10 +1852,10 @@ class DreamController extends Controller
 
             if ($authorData == null) {
                 //著者データなし
-                return response()->json(['status' => Consts::API_FAILED_NODATA, 'msg' => "NULL_AUTHOR"]);
+                return response()->json(['status' => Consts::API_FAILED_NODATA, 'errMsg' => "NULL_AUTHOR"]);
             } else if ($authorData->twitter_id == "") {
                 //著者Twitter非認証
-                return response()->json(['status' => Consts::API_FAILED_NODATA, 'msg' => "AUTH_AUTHOR"]);
+                return response()->json(['status' => Consts::API_FAILED_NODATA, 'errMsg' => "AUTH_AUTHOR"]);
             }
 
             if ($kbn == "TWITTER_SOUGO" || $kbn == "TWITTER_FOLLOW") {
@@ -1865,17 +1865,17 @@ class DreamController extends Controller
                         'userId' => 'required',
                     ]);
                 } catch (ValidationException $e) {
-                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'msg' => $e->getMessage()]);
+                    return response()->json(['status' => Consts::API_FAILED_PARAM, 'errMsg' => $e->getMessage()]);
                 }
                 $userId = $request->userId;
                 $userData =  user::where('user_id', $userId)->first();
                 
                 if ($userData == null) {
                     //自ユーザなし
-                    return response()->json(['status' => Consts::API_FAILED_NODATA, 'msg' => "NULL"]);
+                    return response()->json(['status' => Consts::API_FAILED_NODATA, 'errMsg' => "NULL"]);
                 } else if ($userData->twitter_id == "") {
                     //自ユーザーTwitter非認証
-                    return response()->json(['status' => Consts::API_FAILED_NODATA, 'msg' => "AUTH"]);
+                    return response()->json(['status' => Consts::API_FAILED_NODATA, 'errMsg' => "AUTH"]);
                 }
 
                 $targetTwitterId = $userData->twitter_id;
