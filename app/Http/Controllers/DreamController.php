@@ -1679,7 +1679,7 @@ class DreamController extends Controller
         try {
             $validatedData = $request->validate([
                 'name' => 'required',
-                'mailAddress' => 'required|max:200|email:strict,dns,spoof|string',
+                'mailAddress' => 'required|max:200|string',
                 'phoneNumber' => 'numeric',
                 'body' => 'required',
             ]);
@@ -1693,11 +1693,11 @@ class DreamController extends Controller
         $mailBody = $mailBody . "電話番号：" . $request->phoneNumber . "\r\n";
         $mailBody = $mailBody . "内容：" . $request->body . "\r\n";
         $mailBody = $mailBody . "日時：" . date("Y-m-d H:i:s") . "\r\n";
-        
+
         try {
-            Mail::send(new MailMgr("お問い合わせ", $mailBody, "saga.siga.noga@gmail.com"));
+            Mail::send(new MailMgr("お問い合わせ", $mailBody, "info@yumedrop.com"));
         } catch (Exception $e) {
-            return response()->json(['status' => Consts::API_FAILED_EXEPTION, 'errMsg' => 'リセット申請エラー']);
+            return response()->json(['status' => Consts::API_FAILED_EXEPTION, 'errMsg' => 'お問い合わせエラー']);
         }
         return response()->json(['status' => Consts::API_SUCCESS]); 
     }

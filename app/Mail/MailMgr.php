@@ -29,12 +29,24 @@ class MailMgr extends Mailable
      * @return $this
      */
     public function build()
-    {
-        return $this->to($this->email)
-        ->subject($this->title)
-        ->text('mail')
-        ->with([
-            'body' => $this->body,
-        ]);
+    {   
+
+
+        if ($this->title == "お問い合わせ") {
+            return $this->to($this->email)
+            ->cc('info@toyoit.jp')
+            ->subject($this->title)
+            ->text('mail')
+            ->with([
+                'body' => $this->body,
+            ]);
+        } else {
+            return $this->to($this->email)
+            ->subject($this->title)
+            ->text('mail')
+            ->with([
+                'body' => $this->body,
+            ]);
+        }
     }
 }

@@ -107,7 +107,7 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::get('/{any}', function () {
     $title = "yumedrop"; 
     $cardName = "card_base.jpg";
-    $description = "夢小説投稿サイトです";
+    $description = "yumedropは夢小説専用投稿プラットフォームです";
 
     return view('spa.app')->with(['card' => $cardName, 'title' => $title, 'description' => $description]);
 })->where('any', '.*');
