@@ -1931,6 +1931,8 @@ class DreamController extends Controller
     }
 
     public function test(Request $request): JsonResponse {
+        dd("OK");
+        
         $cardBase = new Imagick(realpath("./") . '/app/img/card_base.jpg');
 
         $draw = new ImagickDraw();
