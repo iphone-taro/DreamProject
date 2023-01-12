@@ -1,0 +1,69 @@
+{
+	"SIDE_A": {
+		"TIME":10000,
+		"ADS":[
+			{
+				"IMG": "yume_s_001.png",
+				"URL": "http://www.yahoo.co.jp"
+			},
+			{
+				"IMG": "yume_s_002.png",
+				"URL": "http://google.co.jp"
+			},
+			{
+				"IMG": "yume_s_003.png",
+				"URL": "http://https://www.rakuten.co.jp/"
+			}
+		]
+	},
+	"BOTTOM_A": {
+		"TIME":10000,
+		"ADS":[
+			{
+				"IMG": "yume_b_001.png",
+				"URL": "http://www.yahoo.co.jp"
+			},
+			{
+				"IMG": "yume_b_002.png",
+				"URL": "http://google.co.jp"
+			},
+			{
+				"IMG": "yume_b_003.png",
+				"URL": "http://https://www.rakuten.co.jp/"
+			}
+		]
+	},
+	"SIDE_B": {
+		"TIME": 30000,
+		"ADS": [
+			"<a href=\"https://px.a8.net/svt/ejp?a8mat=3T024K+2HB1IQ+54EW+60H7L\" rel=\"nofollow\"><img border=\"0\" width=\"300\" height=\"250\" alt=\"\" src=\"https://www26.a8.net/svt/bgt?aid=230110148150&wid=001&eno=01&mid=s00000023900001010000&mc=1\"></a><img border=\"0\" width=\"1\" height=\"1\" src=\"https://www12.a8.net/0.gif?a8mat=3T024K+2HB1IQ+54EW+60H7L\" alt=\"\">",
+			"<a href=\"https://px.a8.net/svt/ejp?a8mat=3T024K+2Q8JLE+2JTU+67JU9\" rel=\"nofollow\"><img border=\"0\" width=\"300\" height=\"250\" alt=\"\" src=\"https://www26.a8.net/svt/bgt?aid=230110148165&wid=001&eno=01&mid=s00000011901001043000&mc=1\"></a><img border=\"0\" width=\"1\" height=\"1\" src=\"https://www12.a8.net/0.gif?a8mat=3T024K+2Q8JLE+2JTU+67JU9\" alt=\"\">",
+			"<a href=\"https://px.a8.net/svt/ejp?a8mat=3T02WS+276O8I+2ZS0+61JSH\" rel=\"nofollow\"><img border=\"0\" width=\"300\" height=\"250\" alt=\"\" src=\"https://www22.a8.net/svt/bgt?aid=230111164133&wid=001&eno=01&mid=s00000013968001015000&mc=1\"></a><img border=\"0\" width=\"1\" height=\"1\" src=\"https://www17.a8.net/0.gif?a8mat=3T02WS+276O8I+2ZS0+61JSH\" alt=\"\">"
+		]
+	},
+	"BOTTOM_B": {
+		"TIME": 30000,
+		"ADS": [
+			"<a href=\"https://px.a8.net/svt/ejp?a8mat=3T024K+2HB1IQ+54EW+5ZU29\" rel=\"nofollow\"><img border=\"0\" width=\"468\" height=\"60\" alt=\"\" src=\"https://www20.a8.net/svt/bgt?aid=230110148150&wid=001&eno=01&mid=s00000023900001007000&mc=1\"></a><img border=\"0\" width=\"1\" height=\"1\" src=\"https://www16.a8.net/0.gif?a8mat=3T024K+2HB1IQ+54EW+5ZU29\" alt=\"\">"
+		]
+	},
+	"SIDE_C": {
+		"TIME": 30000,
+		"ADS": [
+			"<a href=\"https://px.a8.net/svt/ejp?a8mat=3T024K+1GE60I+1892+79X0H\" rel=\"nofollow\"><img border=\"0\" width=\"320\" height=\"50\" alt=\"\" src=\"https://www23.a8.net/svt/bgt?aid=230110148088&wid=001&eno=01&mid=s00000005735001222000&mc=1\"></a><img border=\"0\" width=\"1\" height=\"1\" src=\"https://www14.a8.net/0.gif?a8mat=3T024K+1GE60I+1892+79X0H\" alt=\"\">",
+			"<a href=\"https://px.a8.net/svt/ejp?a8mat=3T024K+1GE60I+1892+7BF0X\" rel=\"nofollow\"><img border=\"0\" width=\"320\" height=\"50\" alt=\"\" src=\"https://www21.a8.net/svt/bgt?aid=230110148088&wid=001&eno=01&mid=s00000005735001229000&mc=1\"></a><img border=\"0\" width=\"1\" height=\"1\" src=\"https://www11.a8.net/0.gif?a8mat=3T024K+1GE60I+1892+7BF0X\" alt=\"\">",
+			"<a href=\"https://px.a8.net/svt/ejp?a8mat=3T024K+1L5MUQ+2ULW+BZ8OX\" rel=\"nofollow\"><img border=\"0\" width=\"320\" height=\"50\" alt=\"\" src=\"https://www27.a8.net/svt/bgt?aid=230110148096&wid=001&eno=01&mid=s00000013298002012000&mc=1\"></a><img border=\"0\" width=\"1\" height=\"1\" src=\"https://www15.a8.net/0.gif?a8mat=3T024K+1L5MUQ+2ULW+BZ8OX\" alt=\"\">",
+			"<a href=\"https://px.a8.net/svt/ejp?a8mat=3T024K+2BCPGY+6HW+3SZMKX\" rel=\"nofollow\"><img border=\"0\" width=\"320\" height=\"50\" alt=\"\" src=\"https://www27.a8.net/svt/bgt?aid=230110148140&wid=001&eno=01&mid=s00000000842023009000&mc=1\"></a><img border=\"0\" width=\"1\" height=\"1\" src=\"https://www11.a8.net/0.gif?a8mat=3T024K+2BCPGY+6HW+3SZMKX\" alt=\"\">",
+			"<a href=\"https://px.a8.net/svt/ejp?a8mat=3T024K+2D50AA+2GMK+ZT81D\" rel=\"nofollow\"><img border=\"0\" width=\"320\" height=\"50\" alt=\"\" src=\"https://www20.a8.net/svt/bgt?aid=230110148143&wid=001&eno=01&mid=s00000011486006015000&mc=1\"></a><img border=\"0\" width=\"1\" height=\"1\" src=\"https://www14.a8.net/0.gif?a8mat=3T024K+2D50AA+2GMK+ZT81D\" alt=\"\">",
+			"<a href=\"https://px.a8.net/svt/ejp?a8mat=3T024K+2MNXYQ+45DI+BYT9D\" rel=\"nofollow\"><img border=\"0\" width=\"320\" height=\"50\" alt=\"\" src=\"https://www25.a8.net/svt/bgt?aid=230110148159&wid=001&eno=01&mid=s00000019359002010000&mc=1\"></a><img border=\"0\" width=\"1\" height=\"1\" src=\"https://www12.a8.net/0.gif?a8mat=3T024K+2MNXYQ+45DI+BYT9D\" alt=\"\">",
+			"<a href=\"https://px.a8.net/svt/ejp?a8mat=3T024M+83QF76+2PEO+1TIR4H\" rel=\"nofollow\"><img border=\"0\" width=\"320\" height=\"50\" alt=\"\" src=\"https://www27.a8.net/svt/bgt?aid=230110150490&wid=001&eno=01&mid=s00000012624011005000&mc=1\"></a><img border=\"0\" width=\"1\" height=\"1\" src=\"https://www13.a8.net/0.gif?a8mat=3T024M+83QF76+2PEO+1TIR4H\" alt=\"\">",
+			"<a href=\"https://px.a8.net/svt/ejp?a8mat=3T024M+AJ954I+4C9U+61RI9\" rel=\"nofollow\"><img border=\"0\" width=\"320\" height=\"50\" alt=\"\" src=\"https://www25.a8.net/svt/bgt?aid=230110150637&wid=001&eno=01&mid=s00000020253001016000&mc=1\"></a><img border=\"0\" width=\"1\" height=\"1\" src=\"https://www14.a8.net/0.gif?a8mat=3T024M+AJ954I+4C9U+61RI9\" alt=\"\">"
+		]
+	},
+	"BOTTOM_C": {
+		"TIME": 30000,
+		"ADS": [
+			"<a href=\"https://px.a8.net/svt/ejp?a8mat=3T024M+83QF76+2PEO+1TIJEP\" rel=\"nofollow\"><img border=\"0\" width=\"468\" height=\"60\" alt=\"\" src=\"https://www29.a8.net/svt/bgt?aid=230110150490&wid=001&eno=01&mid=s00000012624011004000&mc=1\"></a><img border=\"0\" width=\"1\" height=\"1\" src=\"https://www17.a8.net/0.gif?a8mat=3T024M+83QF76+2PEO+1TIJEP\" alt=\"\">"
+		]
+	}
+}

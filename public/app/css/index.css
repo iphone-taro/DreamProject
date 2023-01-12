@@ -635,8 +635,15 @@ input:-webkit-autofill {
     width:100%;
 }
 
-.side {
+.adWidth {
     width:100%;
+}
+
+.adDispSide {
+    display:block;
+}
+.adDispBottom {
+    display:none;
 }
 
 .topImgWidth {
@@ -649,6 +656,13 @@ input:-webkit-autofill {
         margin: 0;  
         padding: 60px 0 0 0;
     } */
+
+    .adDispSide {
+        display:none;
+    }
+    .adDispBottom {
+        display:block;
+    }
 }
 
 @media screen and (min-width : 768px) {
@@ -674,8 +688,15 @@ input:-webkit-autofill {
         margin-right: 20px;
     }
 
-    .side {
+    .adWidth {
         width: 350px;
+    }
+
+    .adDispSide {
+        display:block;
+    }
+    .adDispBottom {
+        display:none;
     }
 
     .disp-pc {

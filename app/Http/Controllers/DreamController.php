@@ -31,13 +31,19 @@ class DreamController extends Controller
     //広告情報取得
     //
     public function getAds(): JsonResponse {
-        $ads = file('../resources/ads.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        $retArray = array();
-        for ($i=0; $i < count($ads); $i++) { 
-            $adInfo = explode(',',  $ads[$i]);
-            array_push($retArray, ['file' => $adInfo[0], 'url' => $adInfo[1]]);
-        }
-        return response()->json(['ads' => $retArray]);
+        $json = file_get_contents("../resources/ads.json");
+        $json = mb_convert_encoding($json, 'UTF8', 'ASCII,JIS,UTF-8,EUC-JP,SJIS-WIN');
+        $arr = json_decode($json,true);
+        return response()->json(['ads' => $arr]);
+        // dd($arr);
+
+        // $ads = file('../resources/ads.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        // $retArray = array();
+        // for ($i=0; $i < count($ads); $i++) { 
+        //     $adInfo = explode(',',  $ads[$i]);
+        //     array_push($retArray, ['file' => $adInfo[0], 'url' => $adInfo[1]]);
+        // }
+        // return response()->json(['ads' => $retArray]);
     }
 
     //
